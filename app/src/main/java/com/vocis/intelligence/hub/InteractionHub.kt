@@ -19,7 +19,7 @@ import com.vocis.intelligence.identity.ReputationLevel
 import com.vocis.intelligence.linguistic.LocalScamClassifier
 import com.vocis.intelligence.linguistic.NotificationSignalExtractor
 import com.vocis.intelligence.linguistic.ScamClassification
-import com.vocis.intelligence.linguistic.SmsSignalExtractor
+
 import com.vocis.emergency.FamilyAlertDispatcher
 import com.vocis.intelligence.incident.SecurityIncidentManager
 import com.vocis.intelligence.policy.ProtectionPolicyEngine
@@ -112,8 +112,7 @@ class InteractionHub(
 
         when (event.type) {
             EventType.SMS_RECEIVED -> {
-                val smsSignals = SmsSignalExtractor.extractAll(event.metadata)
-                contextEngine.onSmsReceived(event, smsSignals)
+                contextEngine.onSmsReceived(event, event.metadata, event.identity)
                 scamClassification = LocalScamClassifier.classify(event.metadata)
             }
             EventType.NOTIFICATION_POSTED -> {
