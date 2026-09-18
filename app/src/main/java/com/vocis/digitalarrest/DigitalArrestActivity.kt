@@ -6,7 +6,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import com.vocis.VocisApplication
 import com.vocis.ui.screens.DigitalArrestScreen
 import com.vocis.ui.theme.VocisTheme
@@ -18,12 +20,27 @@ import com.vocis.ui.theme.VocisTheme
 class DigitalArrestActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.light(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            )
+        )
         super.onCreate(savedInstanceState)
 
         configureWindowForLockscreen()
 
-        val controller = (application as? VocisApplication)?.digitalArrestController
-            ?: DigitalArrestController()
+        val app = application as? VocisApplication
+        val controller = app?.digitalArrestController ?: DigitalArrestController()
+
+        val activeIncident = app?.interactionHub?.activeIncident?.value
+        if (controller.state.value.incidentId == null) {
+            controller.simulateTrigger(this, activeIncident)
+        }
 
         setContent {
             VocisTheme {

@@ -22,9 +22,9 @@ import java.util.concurrent.TimeUnit
  */
 class GroqLlmClient(
     private val apiKey: String? = try {
-        BuildConfig.GROQ_API_KEY.ifBlank { null }
+        BuildConfig.GROQ_API_KEY.ifBlank { System.getenv("GROQ_API_KEY") ?: System.getProperty("GROQ_API_KEY") }
     } catch (e: Throwable) {
-        null
+        System.getenv("GROQ_API_KEY") ?: System.getProperty("GROQ_API_KEY")
     },
     private val httpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(5, TimeUnit.SECONDS)
@@ -72,7 +72,12 @@ class GroqLlmClient(
         transcript: String,
         detectedLanguage: String? = null
     ): SemanticAnalysisResult? {
-        if (apiKey.isNullOrBlank()) {
+        val effectiveApiKey = apiKey?.ifBlank { null }
+            ?: try { BuildConfig.GROQ_API_KEY.ifBlank { null } } catch (_: Throwable) { null }
+            ?: System.getenv("GROQ_API_KEY")
+            ?: System.getProperty("GROQ_API_KEY")
+
+        if (effectiveApiKey.isNullOrBlank()) {
             return null
         }
 
@@ -102,7 +107,7 @@ class GroqLlmClient(
 
             val request = Request.Builder()
                 .url(GROQ_URL)
-                .addHeader("Authorization", "Bearer $apiKey")
+                .addHeader("Authorization", "Bearer $effectiveApiKey")
                 .addHeader("Content-Type", "application/json")
                 .post(payload.toRequestBody(JSON_MEDIA_TYPE))
                 .build()

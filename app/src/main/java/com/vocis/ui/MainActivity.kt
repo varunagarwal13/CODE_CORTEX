@@ -1,13 +1,15 @@
 package com.vocis.ui
 
 import android.Manifest
-import android.app.Activity
 import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,11 +17,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.core.view.WindowCompat
 import com.vocis.VocisApplication
+import com.vocis.core.data.preference.VocisPreferences
 import com.vocis.digitalarrest.DigitalArrestActivity
 import com.vocis.emergency.EmergencyAlertActivity
 import com.vocis.ui.screens.BiometricShell
+import com.vocis.ui.screens.OnboardingScreen
 import com.vocis.ui.screens.SplashScreen
 import com.vocis.ui.theme.VocisTheme
 
@@ -46,8 +49,6 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
         checkAllPermissions()
-        val app = application as? VocisApplication
-        app?.interactionHub?.loadRealCallLogs(this)
     }
 
     private val callScreeningRoleLauncher = registerForActivityResult(
@@ -57,35 +58,44 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.light(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            )
+        )
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
-        // Set light status and navigation bars for pristine modern appearance
-        val window = this.window
-        WindowCompat.getInsetsController(window, window.decorView).apply {
-            isAppearanceLightStatusBars = true
-            isAppearanceLightNavigationBars = true
-        }
-
-        val granted = checkAllPermissions()
-        if (!granted) {
-            requestRequiredPermissions()
-        }
+        checkAllPermissions()
 
         val app = application as? VocisApplication
         val hub = app?.interactionHub
         val arrestController = app?.digitalArrestController
-
-        // Load real call logs from device if permission is available
-        hub?.loadRealCallLogs(this)
+        val onboardingCompleted = VocisPreferences.isOnboardingCompleted(this)
 
         setContent {
             VocisTheme {
-                var showSplash by remember { mutableStateOf(false) }
+                var showSplash by remember { mutableStateOf(true) }
+                var currentOnboarding by remember { mutableStateOf(!onboardingCompleted) }
 
                 if (showSplash) {
                     SplashScreen(
                         onSplashFinished = { showSplash = false }
+                    )
+                } else if (currentOnboarding) {
+                    OnboardingScreen(
+                        onRequestPermissions = {
+                            requestRequiredPermissions()
+                        },
+                        onCompleteOnboarding = {
+                            VocisPreferences.setOnboardingCompleted(this@MainActivity, true)
+                            currentOnboarding = false
+                            requestRequiredPermissions()
+                        }
                     )
                 } else {
                     BiometricShell(
@@ -108,28 +118,29 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        val app = application as? VocisApplication
-        app?.interactionHub?.loadRealCallLogs(this)
-    }
-
     fun requestRequiredPermissions() {
-        // Request Android Runtime Permissions gently
+        // 1. Request Android Runtime Permissions
         permissionLauncher.launch(standardPermissions)
 
-        // Request Call Screening Role on Android Q+ if available
+        // 2. Request Call Screening Role on Android Q+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val roleManager = getSystemService(Context.ROLE_SERVICE) as? RoleManager
             if (roleManager != null &&
                 roleManager.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING) &&
                 !roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)
             ) {
-                try {
-                    val roleIntent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
-                    callScreeningRoleLauncher.launch(roleIntent)
-                } catch (_: Exception) {}
+                val roleIntent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
+                callScreeningRoleLauncher.launch(roleIntent)
             }
+        }
+
+        // 3. Request Overlay Permission if missing
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            val overlayIntent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
+            startActivity(overlayIntent)
         }
     }
 

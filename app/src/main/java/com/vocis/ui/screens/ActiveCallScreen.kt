@@ -8,6 +8,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vocis.ui.theme.VocisAmber
+import com.vocis.ui.theme.VocisAmberLight
 import com.vocis.ui.theme.VocisBorder
 import com.vocis.ui.theme.VocisCardWhite
 import com.vocis.ui.theme.VocisCream
@@ -47,6 +50,17 @@ import com.vocis.ui.theme.VocisMediumGrey
 import com.vocis.ui.theme.VocisRed
 import com.vocis.ui.theme.VocisRedLight
 
+enum class ActiveCallState {
+    IDLE,
+    CONNECTING,
+    ANALYZING,
+    SAFE,
+    SUSPICIOUS,
+    CRITICAL,
+    UNAVAILABLE,
+    ERROR
+}
+
 @Composable
 fun ActiveCallScreen(
     callerName: String = "Incoming Caller",
@@ -54,8 +68,10 @@ fun ActiveCallScreen(
     isCloneDetected: Boolean = false,
     syntheticProbability: Float = 0.05f,
     cosineSimilarity: Float = 0.88f,
+    callState: ActiveCallState = if (isCloneDetected) ActiveCallState.CRITICAL else ActiveCallState.UNAVAILABLE,
     onEndCall: () -> Unit = {},
-    onTriggerEmergency: () -> Unit = {}
+    onTriggerEmergency: () -> Unit = {},
+    onBack: () -> Unit = onEndCall
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
@@ -68,22 +84,48 @@ fun ActiveCallScreen(
         label = "scale"
     )
 
+    val isAlert = callState == ActiveCallState.CRITICAL || callState == ActiveCallState.SUSPICIOUS
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(VocisCream)
-            .padding(horizontal = 24.dp, vertical = 40.dp),
+            .padding(horizontal = 24.dp, vertical = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Top Bar
-        Text(
-            text = "LIVE CALL SCREENING",
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
-            color = VocisMediumGrey,
-            letterSpacing = 2.sp
-        )
+        // Top Bar with Back Navigation
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(VocisCardWhite)
+                    .border(1.dp, VocisBorder, RoundedCornerShape(12.dp))
+                    .clickable { onBack() }
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "← Back",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = VocisDark
+                )
+            }
+
+            Text(
+                text = "LIVE CALL SCREENING",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = VocisMediumGrey,
+                letterSpacing = 2.sp
+            )
+
+            Box(modifier = Modifier.width(48.dp))
+        }
 
         // Center Caller & Waveform Section
         Column(
@@ -95,19 +137,19 @@ fun ActiveCallScreen(
                 modifier = Modifier
                     .size((110 * pulseScale).dp)
                     .clip(CircleShape)
-                    .background(if (isCloneDetected) VocisRedLight else VocisGreenLight)
-                    .border(2.dp, if (isCloneDetected) VocisRed else VocisGreen, CircleShape),
+                    .background(if (isAlert) VocisRedLight else VocisGreenLight)
+                    .border(2.dp, if (isAlert) VocisRed else VocisGreen, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(if (isCloneDetected) VocisRed else VocisGreen),
+                        .background(if (isAlert) VocisRed else VocisGreen),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = callerName.take(1),
+                        text = callerName.take(1).uppercase(),
                         style = MaterialTheme.typography.headlineLarge,
                         color = Color.White,
                         fontWeight = FontWeight.Bold
@@ -134,43 +176,157 @@ fun ActiveCallScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Live Voice Clone Status Pill matching Figma
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        1.dp,
-                        if (isCloneDetected) VocisRed else VocisGreen,
-                        RoundedCornerShape(18.dp)
-                    ),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (isCloneDetected) VocisRedLight else VocisGreenLight
-                ),
-                shape = RoundedCornerShape(18.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = if (isCloneDetected) "⚠️ VOICE CLONE DETECTED" else "✓ CALLER SIGNED & SAFE",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isCloneDetected) VocisRed else VocisGreenText
-                    )
+            // State-Specific Status Card
+            when (callState) {
+                ActiveCallState.UNAVAILABLE -> {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, VocisAmber, RoundedCornerShape(18.dp)),
+                        colors = CardDefaults.cardColors(containerColor = VocisAmberLight),
+                        shape = RoundedCornerShape(18.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "ℹ️ Live Voice Verification Unavailable",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = VocisDark
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                 text = "Biometric neural models standby. Telephony call screening and risk reputation active.",
+                                 style = MaterialTheme.typography.bodySmall,
+                                 color = VocisDark,
+                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+                    }
+                }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                ActiveCallState.CRITICAL -> {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, VocisRed, RoundedCornerShape(18.dp)),
+                        colors = CardDefaults.cardColors(containerColor = VocisRedLight),
+                        shape = RoundedCornerShape(18.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "⚠️ VOICE CLONE DETECTED",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = VocisRed
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Synthetic Prob: ${(syntheticProbability * 100).toInt()}% • High threat clone signature detected",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = VocisRed
+                            )
+                        }
+                    }
+                }
 
-                    Text(
-                        text = if (isCloneDetected)
-                            "Synthetic Prob: ${(syntheticProbability * 100).toInt()}% • High threat clone signature"
-                        else
-                            "Biometric Match: ${(cosineSimilarity * 100).toInt()}% • L2 centroid verified",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (isCloneDetected) VocisRed else VocisGreenText
-                    )
+                ActiveCallState.SAFE -> {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, VocisGreen, RoundedCornerShape(18.dp)),
+                        colors = CardDefaults.cardColors(containerColor = VocisGreenLight),
+                        shape = RoundedCornerShape(18.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "✓ CALLER SIGNED & SAFE",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = VocisGreenText
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Biometric Match: ${(cosineSimilarity * 100).toInt()}% • L2 centroid verified",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = VocisGreenText
+                            )
+                        }
+                    }
+                }
+
+                ActiveCallState.ANALYZING, ActiveCallState.CONNECTING -> {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, VocisBorder, RoundedCornerShape(18.dp)),
+                        colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
+                        shape = RoundedCornerShape(18.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "🎙️ Analyzing Call Audio...",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = VocisDark
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Screening spectral components for synthetic vocoder artifacts",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = VocisMediumGrey
+                            )
+                        }
+                    }
+                }
+
+                else -> {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, VocisBorder, RoundedCornerShape(18.dp)),
+                        colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
+                        shape = RoundedCornerShape(18.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "📞 Call Active",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = VocisDark
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Telephony connection established.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = VocisMediumGrey
+                            )
+                        }
+                    }
                 }
             }
 
@@ -195,7 +351,7 @@ fun ActiveCallScreen(
                             .width(4.dp)
                             .height((h * pulseScale).dp)
                             .clip(RoundedCornerShape(2.dp))
-                            .background(if (isCloneDetected) VocisRed else VocisGreen)
+                            .background(if (isAlert) VocisRed else VocisGreen)
                     )
                 }
             }

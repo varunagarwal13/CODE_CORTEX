@@ -32,7 +32,9 @@ android {
         if (localPropertiesFile.exists()) {
             properties.load(localPropertiesFile.inputStream())
         }
-        val groqApiKey = properties.getProperty("GROQ_API_KEY") ?: ""
+        val groqApiKey = properties.getProperty("GROQ_API_KEY")
+            ?: System.getenv("GROQ_API_KEY")
+            ?: ""
         buildConfigField("String", "GROQ_API_KEY", "\"$groqApiKey\"")
     }
 

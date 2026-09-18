@@ -7,15 +7,20 @@ import com.vocis.core.domain.model.IncidentType
 import com.vocis.core.domain.model.RiskLevel
 import com.vocis.intelligence.identity.CallerIdentity
 import com.vocis.intelligence.risk.EvidenceFactor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.UUID
 
 class SecurityIncidentManager(
-    private val dao: SecurityIncidentDao? = null
+    private val dao: SecurityIncidentDao? = null,
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 ) {
     companion object {
         const val GROUPING_WINDOW_MS: Long = 900_000L // 15 minutes
@@ -24,6 +29,16 @@ class SecurityIncidentManager(
     private val mutex = Mutex()
     private val _activeIncident = MutableStateFlow<SecurityIncidentEntity?>(null)
     val activeIncident: StateFlow<SecurityIncidentEntity?> = _activeIncident.asStateFlow()
+
+    init {
+        if (dao != null) {
+            scope.launch {
+                dao.getActiveIncidentFlow().collect { incident ->
+                    _activeIncident.value = incident
+                }
+            }
+        }
+    }
 
     // In-memory cache for recent open incidents when DAO is mocked or offline
     private val openIncidents = mutableListOf<SecurityIncidentEntity>()

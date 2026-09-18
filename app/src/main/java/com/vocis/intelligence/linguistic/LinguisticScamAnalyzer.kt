@@ -210,4 +210,26 @@ object LocalScamClassifier {
             }
         }
     }
+
+    private val groqClient by lazy { com.vocis.speech.llm.GroqLlmClient() }
+
+    suspend fun classifyWithGroq(text: String): ScamClassification = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        if (text.isBlank()) return@withContext classify(text)
+        try {
+            val groqResult = groqClient.analyzeTranscript(text)
+            if (groqResult != null) {
+                val score = ((groqResult.confidence * 100).toInt()).coerceIn(0, 100)
+                return@withContext ScamClassification(
+                    isScam = groqResult.isScam,
+                    scamScore = if (groqResult.isScam) score.coerceAtLeast(60) else score.coerceAtMost(25),
+                    scamCategory = groqResult.scamCategory.name,
+                    urgencyTactics = groqResult.coercionTactics,
+                    rationale = groqResult.rawExplanation?.ifBlank { null }
+                        ?: "Groq Cloud LLM identified ${groqResult.scamCategory.name} pattern.",
+                    isLocalFallback = false
+                )
+            }
+        } catch (_: Exception) {}
+        classify(text)
+    }
 }
