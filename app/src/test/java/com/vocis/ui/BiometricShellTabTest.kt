@@ -1,19 +1,18 @@
 package com.vocis.ui
 
-import com.vocis.ui.screens.VocisTab
+import com.vocis.ui.screens.VocisTabItem
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 class BiometricShellTabTest {
 
     @Test
     fun `test biometric shell tabs correspond to 5 core navigation screens`() {
-        val dashboard = VocisTab.Dashboard
-        val calls = VocisTab.Calls
-        val voices = VocisTab.Voices
-        val tools = VocisTab.Tools
-        val settings = VocisTab.Settings
+        val dashboard = VocisTabItem.Dashboard
+        val calls = VocisTabItem.Calls
+        val voices = VocisTabItem.Voices
+        val tools = VocisTabItem.Tools
+        val settings = VocisTabItem.Settings
 
         assertEquals(0, dashboard.index)
         assertEquals("Shield", dashboard.label)
@@ -34,11 +33,11 @@ class BiometricShellTabTest {
     @Test
     fun `test all tab indices are unique`() {
         val tabs = listOf(
-            VocisTab.Dashboard,
-            VocisTab.Calls,
-            VocisTab.Voices,
-            VocisTab.Tools,
-            VocisTab.Settings
+            VocisTabItem.Dashboard,
+            VocisTabItem.Calls,
+            VocisTabItem.Voices,
+            VocisTabItem.Tools,
+            VocisTabItem.Settings
         )
 
         val indices = tabs.map { it.index }

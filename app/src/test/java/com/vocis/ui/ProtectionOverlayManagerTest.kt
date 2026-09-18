@@ -1,27 +1,26 @@
 package com.vocis.ui
 
-import android.content.Context
-import android.view.WindowManager
 import com.vocis.ui.overlay.ProtectionOverlayManager
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
+import org.junit.runner.RunWith
 
+/**
+ * Tests ProtectionOverlayManager init and idempotent hide.
+ * Requires Robolectric for Looper.getMainLooper() and WindowManager stubs.
+ */
+@RunWith(RobolectricTestRunner::class)
 class ProtectionOverlayManagerTest {
 
-    private lateinit var mockContext: Context
-    private lateinit var mockWindowManager: WindowManager
     private lateinit var overlayManager: ProtectionOverlayManager
 
     @Before
     fun setUp() {
-        mockContext = mock(Context::class.java)
-        mockWindowManager = mock(WindowManager::class.java)
-        `when`(mockContext.getSystemService(Context.WINDOW_SERVICE)).thenReturn(mockWindowManager)
-        overlayManager = ProtectionOverlayManager(mockContext)
+        overlayManager = ProtectionOverlayManager(RuntimeEnvironment.getApplication())
     }
 
     @Test

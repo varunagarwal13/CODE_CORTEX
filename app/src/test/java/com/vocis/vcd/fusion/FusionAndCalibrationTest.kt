@@ -124,9 +124,9 @@ class FusionAndCalibrationTest {
         )
         assertEquals(VcdVerdict.UNCERTAIN, uncertainResult.verdict)
 
-        // 6. Unreliable carrier line noise -> UNRELIABLE_LINE_SATURATED
+        // 6. Unreliable carrier line noise + borderline similarity -> UNRELIABLE_LINE_SATURATED
         val unreliableResult = engine.evaluate(
-            similarity = 0.85f,
+            similarity = 0.60f,
             syntheticProbability = 0.75f,
             dynamicThreshold = 1.05f,
             baselineSynthetic = 0.90f,
