@@ -1,5 +1,10 @@
 package com.vocis.ui.screens
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,15 +18,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,17 +53,35 @@ import com.vocis.ui.theme.VocisCardWhite
 import com.vocis.ui.theme.VocisCream
 import com.vocis.ui.theme.VocisDark
 import com.vocis.ui.theme.VocisGreen
+import com.vocis.ui.theme.VocisGreenLight
 import com.vocis.ui.theme.VocisGreenText
 import com.vocis.ui.theme.VocisMediumGrey
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    onRevisitOnboarding: () -> Unit = {}
+) {
+    val context = LocalContext.current
     var selectedMode by remember { mutableStateOf(ProtectionMode.BALANCED) }
+    var emergencyContactNumber by remember { mutableStateOf("+91 98888 77771") }
+    var emergencyContactName by remember { mutableStateOf("Mom") }
+
+    var callScreeningEnabled by remember { mutableStateOf(true) }
+    var voiceDefenseEnabled by remember { mutableStateOf(true) }
+    var smsShieldEnabled by remember { mutableStateOf(true) }
+    var overlaysEnabled by remember {
+        mutableStateOf(
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                Settings.canDrawOverlays(context)
+            } else true
+        )
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(VocisCream)
+            .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -63,9 +93,18 @@ fun SettingsScreen() {
             color = VocisDark
         )
 
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Text(
+            text = "Security policies, permissions, and emergency contacts.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = VocisMediumGrey
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            // Section 1: Protection Policy Modes
             item {
                 Text(
                     text = "Protection Policy",
@@ -105,8 +144,72 @@ fun SettingsScreen() {
                 )
             }
 
+            // Section 2: Sensor & Permission Toggles
             item {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Sensor & Protection Toggles",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = VocisDark
+                )
+            }
+
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, VocisBorder, RoundedCornerShape(18.dp)),
+                    colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
+                    shape = RoundedCornerShape(18.dp)
+                ) {
+                    Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        ToggleRow(
+                            title = "Real-Time Call Screening",
+                            subtitle = "Telephony sensor filtering spoofed numbers",
+                            checked = callScreeningEnabled,
+                            onCheckedChange = { callScreeningEnabled = it }
+                        )
+
+                        ToggleRow(
+                            title = "Voice Clone Defense (AASIST)",
+                            subtitle = "On-device neural synthetic speech detector",
+                            checked = voiceDefenseEnabled,
+                            onCheckedChange = { voiceDefenseEnabled = it }
+                        )
+
+                        ToggleRow(
+                            title = "SMS Scam Heuristics",
+                            subtitle = "Linguistic parser detecting extortion keywords",
+                            checked = smsShieldEnabled,
+                            onCheckedChange = { smsShieldEnabled = it }
+                        )
+
+                        ToggleRow(
+                            title = "Floating Threat Overlay HUD",
+                            subtitle = "Display live risk banner during calls",
+                            checked = overlaysEnabled,
+                            onCheckedChange = {
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                                    if (!Settings.canDrawOverlays(context)) {
+                                        val intent = Intent(
+                                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                            Uri.parse("package:${context.packageName}")
+                                        )
+                                        context.startActivity(intent)
+                                    } else {
+                                        overlaysEnabled = it
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Section 3: Emergency Contacts
+            item {
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = "Emergency Response",
                     style = MaterialTheme.typography.titleMedium,
@@ -119,79 +222,128 @@ fun SettingsScreen() {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, VocisBorder, RoundedCornerShape(16.dp)),
+                        .border(1.dp, VocisBorder, RoundedCornerShape(18.dp)),
                     colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(18.dp)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Emergency Keyword",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = VocisDark
-                            )
-
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(VocisCream)
-                                    .border(1.dp, VocisBorder, RoundedCornerShape(8.dp))
-                                    .padding(horizontal = 10.dp, vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = "VOCIS",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = VocisGreenText
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
+                    Column(modifier = Modifier.padding(18.dp)) {
                         Text(
-                            text = "Inbound SMS containing this keyword from authorized contacts instantly activates the emergency alarm loop.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = VocisMediumGrey
-                        )
-                    }
-                }
-            }
-
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, VocisBorder, RoundedCornerShape(16.dp)),
-                    colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "About VOCIS",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
+                            text = "Designated Family SOS Contact",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
                             color = VocisDark
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "VOCIS Voice Security Platform v1.0.0\nRole D Clean-Room Integration Build",
-                            style = MaterialTheme.typography.bodyMedium,
+                            text = "Automatic SMS and Siren dispatch triggers to this contact during emergency alerts.",
+                            style = MaterialTheme.typography.bodySmall,
                             color = VocisMediumGrey
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        OutlinedTextField(
+                            value = emergencyContactName,
+                            onValueChange = { emergencyContactName = it },
+                            label = { Text("Contact Name") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        OutlinedTextField(
+                            value = emergencyContactNumber,
+                            onValueChange = { emergencyContactNumber = it },
+                            label = { Text("Phone Number") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
                         )
                     }
                 }
             }
 
+            // Section 4: Onboarding Tour Card
             item {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(6.dp))
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, VocisBorder, RoundedCornerShape(18.dp))
+                        .clickable { onRevisitOnboarding() },
+                    colors = CardDefaults.cardColors(containerColor = VocisGreenLight),
+                    shape = RoundedCornerShape(18.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(18.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("📖", fontSize = 24.sp)
+                        Spacer(modifier = Modifier.width(14.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Revisit Onboarding Tour",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = VocisGreenText
+                            )
+                            Text(
+                                text = "View Figma welcome screens and permission guide.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = VocisGreenText.copy(alpha = 0.85f)
+                            )
+                        }
+                        Text("→", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = VocisGreenText)
+                    }
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
+    }
+}
+
+@Composable
+fun ToggleRow(
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = VocisDark
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = VocisMediumGrey
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = VocisGreen,
+                uncheckedThumbColor = Color.White,
+                uncheckedTrackColor = VocisBorder
+            )
+        )
     }
 }
 
@@ -209,11 +361,13 @@ fun ProtectionModeOption(
             .border(
                 1.dp,
                 if (selected) VocisGreen else VocisBorder,
-                RoundedCornerShape(16.dp)
+                RoundedCornerShape(18.dp)
             )
             .clickable { onSelect() },
-        colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
-        shape = RoundedCornerShape(16.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) VocisGreenLight else VocisCardWhite
+        ),
+        shape = RoundedCornerShape(18.dp)
     ) {
         Row(
             modifier = Modifier
@@ -224,10 +378,7 @@ fun ProtectionModeOption(
             RadioButton(
                 selected = selected,
                 onClick = onSelect,
-                colors = RadioButtonDefaults.colors(
-                    selectedColor = VocisGreen,
-                    unselectedColor = VocisMediumGrey
-                )
+                colors = RadioButtonDefaults.colors(selectedColor = VocisGreen)
             )
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -235,15 +386,17 @@ fun ProtectionModeOption(
             Column {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = VocisDark
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = if (selected) VocisGreenText else VocisDark
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = VocisMediumGrey,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (selected) VocisGreenText.copy(alpha = 0.85f) else VocisMediumGrey,
                     lineHeight = 18.sp
                 )
             }

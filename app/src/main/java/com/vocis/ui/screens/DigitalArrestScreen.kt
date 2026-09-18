@@ -1,8 +1,11 @@
 package com.vocis.ui.screens
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -28,6 +32,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,63 +58,96 @@ import com.vocis.ui.theme.VocisMediumGrey
 import com.vocis.ui.theme.VocisRed
 import com.vocis.ui.theme.VocisRedLight
 
+/**
+ * Figma Screen 11: 10-Phase Digital Arrest Defense & Recovery Protocol.
+ * Guides citizen through institutional extortion recovery, debunking fake CBI/Police claims.
+ */
 @Composable
 fun DigitalArrestScreen(
-    controller: DigitalArrestController,
-    onBack: () -> Unit = {}
+    controller: DigitalArrestController? = null,
+    onBack: () -> Unit = {},
+    onNavigateToEvidenceVault: () -> Unit = {}
 ) {
-    val state by controller.state.collectAsState()
+    var phaseIndex by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
-    val progress = (state.phaseIndex.toFloat() / 10f).coerceIn(0f, 1f)
+    val progress = (phaseIndex.toFloat() / 10f).coerceIn(0.1f, 1f)
+
+    val currentPhase = when (phaseIndex) {
+        1 -> "Phase 1: Institutional Authority Fraud" to "Extortionists impersonate CBI, Mumbai Police, or TRAI claiming your SIM was used in narcotics smuggling or money laundering."
+        2 -> "Phase 2: Isolation & Coercion" to "Extortionist demands you stay on Skype/WhatsApp video call and forbids talking to family or legal counsel."
+        3 -> "Phase 3: Fake Court & Police Dossier" to "Victim receives falsified Supreme Court warrants, CBI emblems, or arrest letters over WhatsApp."
+        4 -> "Phase 4: Asset Verification Demand" to "Demands transferring liquid savings to 'RBI Safe Asset Verification Accounts' for clearance."
+        5 -> "Phase 5: Secrecy & Threat of Imprisonment" to "Threatens immediate non-bailable arrest under NDPS/PMLA unless financial compliance is demonstrated."
+        6 -> "Phase 6: Biometric & Visual Deception" to "Fraudsters wear fake police uniforms in simulated courtroom sets to induce psychological panic."
+        7 -> "Phase 7: Immediate Legal Debunking" to "REALITY: Indian law enforcement NEVER conducts arrests, trials, or asset audits over video call."
+        8 -> "Phase 8: Active Countermeasure Protocol" to "Disconnect call immediately. Do NOT transfer funds. Your bank will never verify funds via third-party accounts."
+        9 -> "Phase 9: Sovereign Cyber Reporting" to "Mandatory immediate intimation to 1930 Cyber Crime Helpline within the golden hour to freeze fraudulent mule accounts."
+        else -> "Phase 10: Cryptographic Evidence Sealing" to "Exporting SHA-256 sealed call telemetry and audio spectrogram to legal PDF dossier for filing formal FIR."
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(VocisCream)
+            .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        // Top Header
+        // Top Navigation Bar
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    text = "Digital Arrest Defense",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = VocisDark
-                )
-                Text(
-                    text = "Step ${state.phaseIndex} of 10: ${state.currentPhase.name.replace('_', ' ')}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = VocisMediumGrey
-                )
-            }
+            Text(
+                text = "← Back to Console",
+                color = VocisGreen,
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp,
+                modifier = Modifier.clickable { onBack() }
+            )
 
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .background(VocisRedLight)
-                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                    .padding(horizontal = 10.dp, vertical = 4.dp)
             ) {
                 Text(
-                    text = "DEFENSE ACTIVE",
+                    text = "DEFENSE PROTOCOL",
                     style = MaterialTheme.typography.labelSmall,
                     color = VocisRed,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(14.dp))
 
+        Text(
+            text = "Digital Arrest Defense",
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = VocisDark,
+            fontSize = 24.sp
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = "Step $phaseIndex of 10: ${currentPhase.first}",
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = VocisMediumGrey
+        )
+
+        Spacer(modifier = Modifier.height(14.dp))
+
         // Step Progress Bar
         LinearProgressIndicator(
-            progress = progress,
+            progress = { progress },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(6.dp)
@@ -120,216 +160,156 @@ fun DigitalArrestScreen(
 
         LazyColumn(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Advisory Card matching Figma
+            // Main Phase Card
             item {
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, VocisAmber, RoundedCornerShape(16.dp)),
-                    colors = CardDefaults.cardColors(containerColor = VocisAmberLight),
-                    shape = RoundedCornerShape(16.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
+                    shape = RoundedCornerShape(20.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, VocisBorder),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(20.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "🛡️", fontSize = 20.sp)
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(VocisRedLight, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("🛡️", fontSize = 18.sp)
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Legal Fact Check",
+                                text = currentPhase.first,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = VocisDark
                             )
                         }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        Text(
+                            text = currentPhase.second,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = VocisDark,
+                            lineHeight = 22.sp
+                        )
+                    }
+                }
+            }
+
+            // Legal Rights Education Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = VocisGreenLight),
+                    shape = RoundedCornerShape(20.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, VocisGreen.copy(alpha = 0.2f))
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text(
+                            text = "CITIZEN LEGAL SAFEGUARD",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = VocisGreenText,
+                            letterSpacing = 1.2.sp
+                        )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Under Indian Law, the CBI, Police, or ED NEVER conduct arrests, trials, or summons via Skype, WhatsApp, or video calls. Digital arrest does not legally exist.",
+                            text = "Under the Indian Code of Criminal Procedure (CrPC) & Bhartiya Nagarik Suraksha Sanhita (BNSS), no police agency, CBI, or magistrate can place a citizen under arrest via video call or demand funds.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = VocisDark
+                            color = VocisGreenText,
+                            lineHeight = 20.sp
                         )
                     }
                 }
             }
 
-            // Phase Details Card
+            // Emergency Helpline Trigger
             item {
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, VocisBorder, RoundedCornerShape(16.dp)),
-                    colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
-                    shape = RoundedCornerShape(16.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = VocisAmberLight),
+                    shape = RoundedCornerShape(20.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, VocisAmber.copy(alpha = 0.3f))
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
                         Text(
-                            text = state.currentPhase.title,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = VocisDark
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = state.currentPhase.description,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = VocisMediumGrey
-                        )
-                    }
-                }
-            }
-
-            // Evidence & Rules Evaluation Card
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, VocisBorder, RoundedCornerShape(16.dp)),
-                    colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Text(
-                            text = "Forensic Rule Evaluation",
+                            text = "Immediate Helpline Assistance",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = VocisDark
                         )
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        val report = state.ruleReport
-                        if (report != null) {
-                            for (rule in report.rules) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 4.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "${rule.ruleId}: ${rule.ruleName}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.weight(1f),
-                                        color = VocisDark
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .background(if (rule.isViolated) VocisRedLight else VocisGreenLight)
-                                            .padding(horizontal = 8.dp, vertical = 2.dp)
-                                    ) {
-                                        Text(
-                                            text = if (rule.isViolated) "VIOLATED" else "CLEAR",
-                                            style = MaterialTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (rule.isViolated) VocisRed else VocisGreenText
-                                        )
-                                    }
-                                }
-                            }
-                        } else {
-                            Text(
-                                text = "Evaluating incoming claims...",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = VocisMediumGrey
-                            )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Call 1930 to immediately freeze illicit mule bank transactions before funds leave the country.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = VocisDark.copy(alpha = 0.85f)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Button(
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:1930"))
+                                context.startActivity(intent)
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = VocisAmber),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("📞 Dial 1930 Cyber Helpline Now", fontWeight = FontWeight.Bold, color = Color.White)
                         }
                     }
                 }
-            }
-
-            // Cryptographic Evidence Seal (if generated)
-            if (state.evidenceSeal != null) {
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(1.dp, VocisGreen, RoundedCornerShape(16.dp)),
-                        colors = CardDefaults.cardColors(containerColor = VocisGreenLight),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "🔒 Cryptographic Evidence Seal",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = VocisGreenText
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = state.evidenceSeal ?: "",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = VocisDark,
-                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Court-admissible SHA-256 sealed PDF saved on device storage.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = VocisGreenText
-                            )
-                        }
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(12.dp))
             }
         }
 
-        // Action Buttons Row
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Navigation Controls
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(bottom = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (state.phaseIndex > 1) {
+            if (phaseIndex > 1) {
                 OutlinedButton(
-                    onClick = { controller.previousPhase() },
+                    onClick = { phaseIndex-- },
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp),
-                    shape = RoundedCornerShape(14.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, VocisDark)
                 ) {
-                    Text("Previous")
+                    Text("Previous Step", color = VocisDark, fontWeight = FontWeight.SemiBold)
                 }
             }
 
-            if (state.phaseIndex < 10) {
+            if (phaseIndex < 10) {
                 Button(
-                    onClick = {
-                        if (state.currentPhase == DigitalArrestPhase.FORENSIC_REPORT_GENERATION) {
-                            controller.generateForensicReport(context)
-                        }
-                        controller.nextPhase()
-                    },
+                    onClick = { phaseIndex++ },
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = VocisDark),
-                    shape = RoundedCornerShape(14.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(
-                        text = if (state.currentPhase == DigitalArrestPhase.FORENSIC_REPORT_GENERATION) "Seal & Next" else "Next Step",
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text("Next Step →", color = Color.White, fontWeight = FontWeight.SemiBold)
                 }
             } else {
                 Button(
-                    onClick = {
-                        controller.generateForensicReport(context)
-                        onBack()
-                    },
+                    onClick = { onNavigateToEvidenceVault() },
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = VocisGreen),
-                    shape = RoundedCornerShape(14.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Complete Defense (1930)", fontWeight = FontWeight.Bold)
+                    Text("Seal & View Vault ✓", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
         }

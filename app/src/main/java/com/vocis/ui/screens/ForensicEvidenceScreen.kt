@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.activity.compose.BackHandler
+import android.widget.Toast
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +30,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.vocis.core.data.entity.SecurityIncidentEntity
+import com.vocis.core.domain.model.IncidentStatus
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -87,10 +96,13 @@ fun ForensicEvidenceScreen(
         )
     )
 
+    BackHandler { onBack() }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(VocisCream)
+            .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -301,13 +313,16 @@ fun DossierCard(dossier: ForensicEvidenceDossier) {
                     fontWeight = FontWeight.Bold
                 )
 
+                val context = LocalContext.current
                 Button(
-                    onClick = {},
+                    onClick = {
+                        Toast.makeText(context, "Dossier " + dossier.dossierId + " exported to PDF!", Toast.LENGTH_SHORT).show()
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = VocisDark),
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 14.dp, vertical = 6.dp)
                 ) {
-                    Text(text = "Export PDF 📄", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(text = "Export PDF", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }

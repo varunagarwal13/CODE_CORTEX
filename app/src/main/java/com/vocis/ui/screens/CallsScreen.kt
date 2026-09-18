@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,10 +22,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,19 +61,40 @@ fun CallsScreen(
     interactionHub: InteractionHub? = null,
     onSelectCall: (InteractionEntity) -> Unit = {}
 ) {
-    val interactions by (interactionHub?.interactions?.collectAsState() ?: androidx.compose.runtime.remember {
-        androidx.compose.runtime.mutableStateOf(emptyList<InteractionEntity>())
+    val interactions by (interactionHub?.interactions?.collectAsState() ?: remember {
+        mutableStateOf(emptyList<InteractionEntity>())
     })
+
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedFilter by remember { mutableStateOf("All") } // "All", "Threats", "Safe"
+
+    val filteredList = remember(interactions, searchQuery, selectedFilter) {
+        interactions.filter { item ->
+            val matchesQuery = searchQuery.isBlank() ||
+                    item.title.contains(searchQuery, ignoreCase = true) ||
+                    item.callerPhoneNumber.contains(searchQuery, ignoreCase = true) ||
+                    item.summary.contains(searchQuery, ignoreCase = true)
+
+            val matchesFilter = when (selectedFilter) {
+                "Threats" -> item.riskLevel >= RiskLevel.HIGH || item.isBlocked
+                "Safe" -> item.riskLevel < RiskLevel.HIGH && !item.isBlocked
+                else -> true
+            }
+
+            matchesQuery && matchesFilter
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(VocisCream)
+            .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Header matching Figma "Calls" title
+        // Header
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -89,16 +115,54 @@ fun CallsScreen(
                     .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
                 Text(
-                    text = "${interactions.size} calls",
+                    text = "${filteredList.size} of ${interactions.size} calls",
                     style = MaterialTheme.typography.labelSmall,
                     color = VocisMediumGrey
                 )
             }
         }
 
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Search bar
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(VocisCardWhite, RoundedCornerShape(14.dp)),
+            placeholder = { Text("Search name, number or threat...", color = VocisMediumGrey, fontSize = 14.sp) },
+            singleLine = true,
+            shape = RoundedCornerShape(14.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Filter chips
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("All", "Threats", "Safe").forEach { filter ->
+                val isSelected = selectedFilter == filter
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(if (isSelected) VocisDark else VocisCardWhite)
+                        .border(1.dp, if (isSelected) VocisDark else VocisBorder, RoundedCornerShape(20.dp))
+                        .clickable { selectedFilter = filter }
+                        .padding(horizontal = 14.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = filter,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) Color.White else VocisDark
+                    )
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (interactions.isEmpty()) {
+        if (filteredList.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -106,16 +170,17 @@ fun CallsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "📞", fontSize = 48.sp)
+                    Text(text = "📞", fontSize = 44.sp)
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "No call records yet",
+                        text = if (searchQuery.isNotBlank()) "No calls match search" else "No call records yet",
                         style = MaterialTheme.typography.titleMedium,
-                        color = VocisDark
+                        color = VocisDark,
+                        fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Incoming calls screened by VOCIS will appear here.",
+                        text = "Incoming phone calls and screened numbers appear here.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = VocisMediumGrey
                     )
@@ -126,11 +191,15 @@ fun CallsScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(interactions) { call ->
-                    CallHistoryCard(call = call, onClick = { onSelectCall(call) })
+                items(filteredList) { call ->
+                    CallLogItem(
+                        interaction = call,
+                        onClick = { onSelectCall(call) }
+                    )
                 }
+
                 item {
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
             }
         }
@@ -138,21 +207,15 @@ fun CallsScreen(
 }
 
 @Composable
-fun CallHistoryCard(
-    call: InteractionEntity,
+fun CallLogItem(
+    interaction: InteractionEntity,
     onClick: () -> Unit
 ) {
-    val (pillBg, pillTextColor) = when (call.riskLevel) {
+    val (badgeBg, badgeColor) = when (interaction.riskLevel) {
         RiskLevel.LOW -> VocisGreenLight to VocisGreenText
         RiskLevel.ELEVATED -> VocisBlueLight to VocisBlue
         RiskLevel.HIGH -> VocisAmberLight to VocisAmber
         RiskLevel.CRITICAL -> VocisRedLight to VocisRed
-    }
-
-    val iconText = when {
-        call.isBlocked -> "🚫"
-        call.riskLevel >= RiskLevel.HIGH -> "⚠️"
-        else -> "📞"
     }
 
     Card(
@@ -167,55 +230,58 @@ fun CallHistoryCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(VocisCream),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = iconText, fontSize = 20.sp)
-            }
-
-            Spacer(modifier = Modifier.width(14.dp))
-
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = if (call.callerDisplayName.isNotBlank()) call.callerDisplayName else call.callerPhoneNumber,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = VocisDark
-                )
-                if (call.callerDisplayName.isNotBlank() && call.callerPhoneNumber.isNotBlank()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = call.callerPhoneNumber,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = VocisMediumGrey
+                        text = if (interaction.callerDisplayName.isNotBlank()) interaction.callerDisplayName else interaction.callerPhoneNumber,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = VocisDark
                     )
                 }
-                Spacer(modifier = Modifier.height(2.dp))
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
-                    text = call.timestamp,
+                    text = interaction.summary.ifBlank { "Telephony interaction screened" },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = VocisMediumGrey,
+                    maxLines = 1
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = interaction.timestamp,
                     style = MaterialTheme.typography.labelSmall,
                     color = VocisLightGrey
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Column(horizontalAlignment = Alignment.End) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(badgeBg)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = interaction.riskLevel.name,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = badgeColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(pillBg)
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
+                Spacer(modifier = Modifier.height(6.dp))
+
                 Text(
-                    text = call.riskLevel.name,
+                    text = "View Details →",
                     style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = pillTextColor
+                    color = VocisMediumGrey
                 )
             }
         }

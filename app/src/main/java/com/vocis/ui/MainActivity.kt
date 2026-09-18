@@ -1,32 +1,31 @@
 package com.vocis.ui
 
 import android.Manifest
+import android.app.Activity
 import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.view.WindowCompat
 import com.vocis.VocisApplication
 import com.vocis.digitalarrest.DigitalArrestActivity
 import com.vocis.emergency.EmergencyAlertActivity
 import com.vocis.ui.screens.BiometricShell
-import com.vocis.ui.screens.OnboardingScreen
 import com.vocis.ui.screens.SplashScreen
 import com.vocis.ui.theme.VocisTheme
 
 class MainActivity : ComponentActivity() {
 
     private var hasAllPermissions by mutableStateOf(false)
-    private var showOnboarding by mutableStateOf(false)
 
     // Standard runtime permissions
     private val standardPermissions = mutableListOf(
@@ -47,6 +46,8 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
         checkAllPermissions()
+        val app = application as? VocisApplication
+        app?.interactionHub?.loadRealCallLogs(this)
     }
 
     private val callScreeningRoleLauncher = registerForActivityResult(
@@ -57,31 +58,34 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
-        checkAllPermissions()
+        // Set light status and navigation bars for pristine modern appearance
+        val window = this.window
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = true
+            isAppearanceLightNavigationBars = true
+        }
+
+        val granted = checkAllPermissions()
+        if (!granted) {
+            requestRequiredPermissions()
+        }
 
         val app = application as? VocisApplication
         val hub = app?.interactionHub
         val arrestController = app?.digitalArrestController
 
+        // Load real call logs from device if permission is available
+        hub?.loadRealCallLogs(this)
+
         setContent {
             VocisTheme {
-                var showSplash by remember { mutableStateOf(true) }
-                var currentOnboarding by remember { mutableStateOf(showOnboarding) }
+                var showSplash by remember { mutableStateOf(false) }
 
                 if (showSplash) {
                     SplashScreen(
                         onSplashFinished = { showSplash = false }
-                    )
-                } else if (currentOnboarding) {
-                    OnboardingScreen(
-                        onRequestPermissions = {
-                            requestRequiredPermissions()
-                        },
-                        onCompleteOnboarding = {
-                            currentOnboarding = false
-                            requestRequiredPermissions()
-                        }
                     )
                 } else {
                     BiometricShell(
@@ -104,29 +108,28 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val app = application as? VocisApplication
+        app?.interactionHub?.loadRealCallLogs(this)
+    }
+
     fun requestRequiredPermissions() {
-        // 1. Request Android Runtime Permissions
+        // Request Android Runtime Permissions gently
         permissionLauncher.launch(standardPermissions)
 
-        // 2. Request Call Screening Role on Android Q+
+        // Request Call Screening Role on Android Q+ if available
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val roleManager = getSystemService(Context.ROLE_SERVICE) as? RoleManager
             if (roleManager != null &&
                 roleManager.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING) &&
                 !roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)
             ) {
-                val roleIntent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
-                callScreeningRoleLauncher.launch(roleIntent)
+                try {
+                    val roleIntent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
+                    callScreeningRoleLauncher.launch(roleIntent)
+                } catch (_: Exception) {}
             }
-        }
-
-        // 3. Request Overlay Permission if missing
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            val overlayIntent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:$packageName")
-            )
-            startActivity(overlayIntent)
         }
     }
 

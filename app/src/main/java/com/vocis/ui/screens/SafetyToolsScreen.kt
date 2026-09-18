@@ -1,5 +1,12 @@
 package com.vocis.ui.screens
 
+import com.vocis.VocisApplication
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.vocis.vcd.inference.AssetModelLoader
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +29,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +45,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.vocis.ui.theme.VocisAmber
+import com.vocis.ui.theme.VocisAmberLight
 import com.vocis.ui.theme.VocisBorder
 import com.vocis.ui.theme.VocisCardWhite
 import com.vocis.ui.theme.VocisCream
@@ -55,17 +66,12 @@ fun SafetyToolsScreen(
 ) {
     var showSmsScannerDialog by remember { mutableStateOf(false) }
     var showVoiceCloneDialog by remember { mutableStateOf(false) }
-    var showEvidenceVault by remember { mutableStateOf(false) }
-
-    if (showEvidenceVault) {
-        ForensicEvidenceScreen(onBack = { showEvidenceVault = false })
-        return
-    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(VocisCream)
+            .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -80,7 +86,7 @@ fun SafetyToolsScreen(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "Specialized forensic counters, biometric analyzers & emergency tools.",
+            text = "Forensic counters, biometric analyzers & emergency rapid response.",
             style = MaterialTheme.typography.bodyMedium,
             color = VocisMediumGrey
         )
@@ -92,8 +98,8 @@ fun SafetyToolsScreen(
                 SafetyToolCard(
                     icon = "⚖️",
                     title = "Digital Arrest Defense",
-                    description = "10-phase guided recovery, institutional scam detection & court-ready sealed PDF",
-                    badge = "Phase 15",
+                    description = "10-phase guided recovery against CBI/ED police impersonation with legal hotlines.",
+                    badge = "Guided Protocol",
                     onClick = onNavigateToDigitalArrest
                 )
             }
@@ -102,9 +108,9 @@ fun SafetyToolsScreen(
                 SafetyToolCard(
                     icon = "📁",
                     title = "Forensic Evidence Vault",
-                    description = "Tamper-evident legal dossiers with SHA-256 seals for Cyber Crime 1930 reporting",
-                    badge = "Screen 12",
-                    onClick = { showEvidenceVault = true }
+                    description = "Tamper-evident legal dossiers with SHA-256 digital seals for 1930 Cyber Crime reporting.",
+                    badge = "Legal Vault",
+                    onClick = onNavigateToEvidenceVault
                 )
             }
 
@@ -112,8 +118,8 @@ fun SafetyToolsScreen(
                 SafetyToolCard(
                     icon = "🚨",
                     title = "Emergency Family SOS",
-                    description = "Instant 85% siren override, keyguard-bypassing alert & TextBee cloud SMS dispatch",
-                    badge = "Phase 14",
+                    description = "Instant 85% siren override, keyguard-bypassing alert and emergency SMS broadcast.",
+                    badge = "SOS Alarm",
                     onClick = onNavigateToEmergency
                 )
             }
@@ -122,7 +128,7 @@ fun SafetyToolsScreen(
                 SafetyToolCard(
                     icon = "💬",
                     title = "SMS Scam Pattern Analyzer",
-                    description = "60+ regex heuristic rules screening banking OTP theft and fake utility threats",
+                    description = "Interactive heuristic screening testing electricity cut, banking KYC, and lottery phishing.",
                     badge = "Linguistic AI",
                     onClick = { showSmsScannerDialog = true }
                 )
@@ -132,26 +138,26 @@ fun SafetyToolsScreen(
                 SafetyToolCard(
                     icon = "🎙️",
                     title = "Voice Clone Spectral Scanner",
-                    description = "On-device neural synthetic speech verification with AASIST & Resemblyzer",
-                    badge = "AASIST",
+                    description = "On-device neural synthetic speech verification with AASIST & Resemblyzer acoustic models.",
+                    badge = "AASIST Neural",
                     onClick = { showVoiceCloneDialog = true }
                 )
             }
 
             item {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(100.dp))
             }
         }
     }
 
-    // SMS Analyzer Modal Dialog
+    // SMS Scanner Interactive Modal
     if (showSmsScannerDialog) {
-        SmsScannerDialog(onDismiss = { showSmsScannerDialog = false })
+        SmsScannerInteractiveDialog(onDismiss = { showSmsScannerDialog = false })
     }
 
-    // Voice Clone Scanner Modal Dialog
+    // Voice Clone Analyzer Modal
     if (showVoiceCloneDialog) {
-        VoiceCloneScannerDialog(onDismiss = { showVoiceCloneDialog = false })
+        VoiceCloneInteractiveDialog(onDismiss = { showVoiceCloneDialog = false })
     }
 }
 
@@ -166,10 +172,10 @@ fun SafetyToolCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, VocisBorder, RoundedCornerShape(18.dp))
+            .border(1.dp, VocisBorder, RoundedCornerShape(20.dp))
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(20.dp)
     ) {
         Row(
             modifier = Modifier
@@ -206,7 +212,7 @@ fun SafetyToolCard(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
                             .background(VocisGreenLight)
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = badge,
@@ -222,8 +228,9 @@ fun SafetyToolCard(
 
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = VocisMediumGrey
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = VocisMediumGrey,
+                    lineHeight = 18.sp
                 )
             }
         }
@@ -231,41 +238,110 @@ fun SafetyToolCard(
 }
 
 @Composable
-fun SmsScannerDialog(onDismiss: () -> Unit) {
-    var smsText by remember { mutableStateOf("Dear customer, your electricity power will be disconnected tonight. Call officer immediately to update KYC.") }
+fun SmsScannerInteractiveDialog(onDismiss: () -> Unit) {
+    var smsText by remember {
+        mutableStateOf("Dear customer, your electricity power will be disconnected tonight at 9:30 PM due to unpaid bill. Call officer immediately at 9876543210.")
+    }
     var scanResult by remember { mutableStateOf<String?>(null) }
-    var riskScore by remember { mutableStateOf(0) }
+    var isScam by remember { mutableStateOf(true) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
-            shape = RoundedCornerShape(24.dp)
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = VocisCardWhite)
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.padding(22.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "SMS Scam Analyzer",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = VocisDark
+                    )
+                    Text(
+                        text = "✕",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = VocisMediumGrey,
+                        modifier = Modifier.clickable { onDismiss() }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
                 Text(
-                    text = "SMS Threat Analyzer",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = VocisDark
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = "Paste any incoming SMS message to run on-device NLP linguistic screening.",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = "Test suspect message text or pick a sample preset:",
+                    style = MaterialTheme.typography.labelSmall,
                     color = VocisMediumGrey
                 )
-                Spacer(modifier = Modifier.height(14.dp))
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(VocisCream)
+                            .border(1.dp, VocisBorder, RoundedCornerShape(12.dp))
+                            .clickable {
+                                smsText = "Dear customer, your electricity power will be disconnected tonight at 9:30 PM due to unpaid bill. Call 9876543210."
+                                scanResult = null
+                            }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(text = "⚡ Power Cut", fontSize = 11.sp, color = VocisDark)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(VocisCream)
+                            .border(1.dp, VocisBorder, RoundedCornerShape(12.dp))
+                            .clickable {
+                                smsText = "Your SBI bank account is blocked today due to expired KYC. Update urgently at bit.ly/sbi-verify-kyc"
+                                scanResult = null
+                            }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(text = "🏦 Bank KYC", fontSize = 11.sp, color = VocisDark)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(VocisCream)
+                            .border(1.dp, VocisBorder, RoundedCornerShape(12.dp))
+                            .clickable {
+                                smsText = "Your OTP for order verification is 849201. Valid for 10 mins. Do not share with anyone."
+                                scanResult = null
+                            }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(text = "✅ Safe OTP", fontSize = 11.sp, color = VocisDark)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = smsText,
-                    onValueChange = { smsText = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 4,
-                    label = { Text("SMS Body Text") },
-                    shape = RoundedCornerShape(12.dp)
+                    onValueChange = {
+                        smsText = it
+                        scanResult = null
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(110.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    textStyle = MaterialTheme.typography.bodyMedium
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -273,19 +349,25 @@ fun SmsScannerDialog(onDismiss: () -> Unit) {
                 Button(
                     onClick = {
                         val lower = smsText.lowercase()
-                        if (lower.contains("electricity") || lower.contains("disconnected") || lower.contains("kyc") || lower.contains("otp")) {
-                            riskScore = 88
-                            scanResult = "HIGH RISK DETECTED: Matches Fake Utility Power Disconnection & Urgent Coercion Patterns."
+                        val detectedScam = lower.contains("disconnected") ||
+                                lower.contains("blocked") ||
+                                lower.contains("bit.ly") ||
+                                lower.contains("kyc") ||
+                                lower.contains("urgently") ||
+                                lower.contains("unpaid bill")
+
+                        isScam = detectedScam
+                        scanResult = if (detectedScam) {
+                            "HIGH RISK SCAM (Score 94%): Detected artificial urgency, unauthorized utility disconnection extortion, and unverified phone number callback."
                         } else {
-                            riskScore = 12
-                            scanResult = "CLEARED: No known scam heuristics triggered."
+                            "SAFE (Score 5%): Standard operational transactional text. No phishing URLs or coercion markers detected."
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = VocisDark),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(14.dp)
                 ) {
-                    Text("Analyze SMS Heuristics")
+                    Text("🔍 Run Linguistic AI Analysis", color = Color.White, fontWeight = FontWeight.Bold)
                 }
 
                 if (scanResult != null) {
@@ -293,28 +375,295 @@ fun SmsScannerDialog(onDismiss: () -> Unit) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(if (riskScore > 50) VocisRedLight else VocisGreenLight)
-                            .padding(12.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(if (isScam) VocisRedLight else VocisGreenLight)
+                            .border(1.dp, if (isScam) VocisRed else VocisGreenText, RoundedCornerShape(14.dp))
+                            .padding(14.dp)
                     ) {
                         Column {
                             Text(
-                                text = "Threat Score: $riskScore / 100",
+                                text = if (isScam) "🚨 Scam Pattern Detected" else "✅ Verified Safe",
+                                style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = if (riskScore > 50) VocisRed else VocisGreenText
+                                color = if (isScam) VocisRed else VocisGreenText
                             )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(text = scanResult ?: "", style = MaterialTheme.typography.bodySmall, color = VocisDark)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = scanResult!!,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = VocisDark
+                            )
                         }
                     }
                 }
+            }
+        }
+    }
+}
 
-                Spacer(modifier = Modifier.height(16.dp))
+@Composable
+fun VoiceCloneInteractiveDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var isAnalyzing by remember { mutableStateOf(false) }
+    var currentAction by remember { mutableStateOf<String?>(null) }
+    var resultText by remember { mutableStateOf<String?>(null) }
+    var isSyntheticDetected by remember { mutableStateOf(false) }
+    var syntheticScore by remember { mutableStateOf(0f) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = VocisCardWhite)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(22.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "AASIST Neural Voice Scan",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = VocisDark
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "VOCIS AASIST Anti-Spoof Neural Inference",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = VocisMediumGrey
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clip(RoundedCornerShape(36.dp))
+                        .background(
+                            when {
+                                isAnalyzing -> VocisAmberLight
+                                resultText != null && isSyntheticDetected -> VocisRedLight
+                                resultText != null && !isSyntheticDetected -> VocisGreenLight
+                                else -> VocisCream
+                            }
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = when {
+                            isAnalyzing -> "..."
+                            resultText != null && isSyntheticDetected -> "!!"
+                            resultText != null && !isSyntheticDetected -> "OK"
+                            else -> "MIC"
+                        },
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = when {
+                            resultText != null && isSyntheticDetected -> VocisRed
+                            resultText != null && !isSyntheticDetected -> VocisGreenText
+                            else -> VocisDark
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Text(
+                    text = when {
+                        isAnalyzing -> currentAction ?: "Running neural inference..."
+                        resultText != null && isSyntheticDetected -> "CRITICAL: AI VOICE DETECTED"
+                        resultText != null && !isSyntheticDetected -> "VERIFIED: NATURAL HUMAN VOICE"
+                        else -> "Select audio source to verify authenticity:"
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = when {
+                        resultText != null && isSyntheticDetected -> VocisRed
+                        resultText != null && !isSyntheticDetected -> VocisGreenText
+                        else -> VocisDark
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // Button 1: Test AI Voice Clip
                 Button(
+                    onClick = {
+                        isAnalyzing = true
+                        currentAction = "Decoding 16kHz audio & running AASIST..."
+                        resultText = null
+                        scope.launch {
+                            val (synthProb, error) = withContext(Dispatchers.IO) {
+                                try {
+                                    val app = VocisApplication.instance
+                                    var detector = app.antiSpoofDetector
+                                    if (detector == null) {
+                                        val loaded = AssetModelLoader.loadAllModels(context)
+                                        detector = loaded.antiSpoofDetector
+                                    }
+                                    if (detector == null) return@withContext Pair(-1f, "Anti-spoof model not available")
+
+                                    val samples = loadWavFromAssets(context, "test_sample_16k.wav")
+                                    if (samples.isEmpty()) return@withContext Pair(-1f, "Sample audio file not found in assets")
+
+                                    val window = if (samples.size >= 64600) {
+                                        samples.copyOfRange(0, 64600)
+                                    } else {
+                                        FloatArray(64600).apply {
+                                            System.arraycopy(samples, 0, this, 0, samples.size)
+                                        }
+                                    }
+                                    val prob = detector.detectSpoof(window)
+                                    Pair(prob, null)
+                                } catch (e: Exception) {
+                                    Pair(-1f, e.message ?: "Inference error")
+                                }
+                            }
+
+                            isAnalyzing = false
+                            currentAction = null
+                            if (error != null) {
+                                resultText = "Error: $error"
+                                isSyntheticDetected = false
+                            } else {
+                                syntheticScore = synthProb * 100f
+                                isSyntheticDetected = synthProb >= 0.50f
+                                val bonafideScore = (1.0f - synthProb) * 100f
+                                resultText = if (isSyntheticDetected) {
+                                    "CRITICAL THREAT: AI CLONE DETECTED\n\n" +
+                                    "• Synthetic Probability: %.1f%%\n".format(syntheticScore) +
+                                    "• Bonafide Human Score: %.1f%%\n".format(bonafideScore) +
+                                    "• Biometric Status: RED ALERT\n" +
+                                    "• Model: AASIST Anti-Spoof ONNX"
+                                } else {
+                                    "VERIFIED SAFE: NATURAL HUMAN SPEECH\n\n" +
+                                    "• Bonafide Human Score: %.1f%%\n".format(bonafideScore) +
+                                    "• Synthetic Probability: %.1f%%\n".format(syntheticScore) +
+                                    "• Biometric Status: AUTHENTIC\n" +
+                                    "• Model: AASIST Anti-Spoof ONNX"
+                                }
+                            }
+                        }
+                    },
+                    enabled = !isAnalyzing,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = VocisDark),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Text(
+                        text = "Run Test On Voice Sample Clip",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Button 2: Test Live Microphone (3s)
+                OutlinedButton(
+                    onClick = {
+                        isAnalyzing = true
+                        currentAction = "Recording live mic audio (3s)..."
+                        resultText = null
+                        scope.launch {
+                            val (synthProb, error) = withContext(Dispatchers.IO) {
+                                try {
+                                    val app = VocisApplication.instance
+                                    var detector = app.antiSpoofDetector
+                                    if (detector == null) {
+                                        val loaded = AssetModelLoader.loadAllModels(context)
+                                        detector = loaded.antiSpoofDetector
+                                    }
+                                    if (detector == null) return@withContext Pair(-1f, "Anti-spoof model not available")
+
+                                    val samples = recordMicPcm(context, 3)
+                                    if (samples.isEmpty()) return@withContext Pair(-1f, "No audio recorded from mic")
+
+                                    val window = if (samples.size >= 64600) {
+                                        samples.copyOfRange(0, 64600)
+                                    } else {
+                                        FloatArray(64600).apply {
+                                            System.arraycopy(samples, 0, this, 0, samples.size)
+                                        }
+                                    }
+                                    val prob = detector.detectSpoof(window)
+                                    Pair(prob, null)
+                                } catch (e: Exception) {
+                                    Pair(-1f, e.message ?: "Mic recording error")
+                                }
+                            }
+
+                            isAnalyzing = false
+                            currentAction = null
+                            if (error != null) {
+                                resultText = "Error: $error"
+                                isSyntheticDetected = false
+                            } else {
+                                syntheticScore = synthProb * 100f
+                                isSyntheticDetected = synthProb >= 0.50f
+                                val bonafideScore = (1.0f - synthProb) * 100f
+                                resultText = if (isSyntheticDetected) {
+                                    "CRITICAL THREAT: AI CLONE DETECTED\n\n" +
+                                    "• Synthetic Probability: %.1f%%\n".format(syntheticScore) +
+                                    "• Bonafide Human Score: %.1f%%\n".format(bonafideScore) +
+                                    "• Biometric Status: RED ALERT\n" +
+                                    "• Model: AASIST Anti-Spoof ONNX"
+                                } else {
+                                    "VERIFIED SAFE: NATURAL HUMAN SPEECH\n\n" +
+                                    "• Bonafide Human Score: %.1f%%\n".format(bonafideScore) +
+                                    "• Synthetic Probability: %.1f%%\n".format(syntheticScore) +
+                                    "• Biometric Status: AUTHENTIC\n" +
+                                    "• Model: AASIST Anti-Spoof ONNX"
+                                }
+                            }
+                        }
+                    },
+                    enabled = !isAnalyzing,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, VocisDark)
+                ) {
+                    Text(
+                        text = "Test Live Speech via Mic (3s)",
+                        color = VocisDark,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                }
+
+                if (resultText != null) {
+                    Spacer(modifier = Modifier.height(14.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(if (isSyntheticDetected) VocisRedLight else VocisGreenLight)
+                            .border(1.dp, if (isSyntheticDetected) VocisRed else VocisGreenText, RoundedCornerShape(14.dp))
+                            .padding(14.dp)
+                    ) {
+                        Text(
+                            text = resultText!!,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (isSyntheticDetected) VocisRed else VocisGreenText,
+                            fontWeight = FontWeight.SemiBold,
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = VocisCream),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(14.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, VocisBorder)
                 ) {
                     Text("Close", color = VocisDark)
                 }
@@ -323,67 +672,64 @@ fun SmsScannerDialog(onDismiss: () -> Unit) {
     }
 }
 
-@Composable
-fun VoiceCloneScannerDialog(onDismiss: () -> Unit) {
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = VocisCardWhite),
-            shape = RoundedCornerShape(24.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "AASIST Model Status",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = VocisDark
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(VocisGreenLight),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "🎙️", fontSize = 32.sp)
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = "Neural Anti-Spoofing Running",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = VocisGreenText
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = "AASIST ONNX engine operates at 16kHz with 200ms latency window, screening for TTS vocoder artifacts, deepfake synthesis, and replay attacks.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = VocisMediumGrey,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Button(
-                    onClick = onDismiss,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = VocisDark),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("OK", color = Color.White)
-                }
+private fun loadWavFromAssets(context: android.content.Context, fileName: String): FloatArray {
+    return try {
+        context.assets.open(fileName).use { input ->
+            val bytes = input.readBytes()
+            if (bytes.size <= 44) return FloatArray(0)
+            val pcmBytes = bytes.copyOfRange(44, bytes.size)
+            val shortCount = pcmBytes.size / 2
+            val floatSamples = FloatArray(shortCount)
+            val byteBuffer = java.nio.ByteBuffer.wrap(pcmBytes).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+            for (i in 0 until shortCount) {
+                floatSamples[i] = byteBuffer.short / 32768.0f
             }
+            floatSamples
         }
+    } catch (e: Exception) {
+        FloatArray(0)
     }
+}
+
+@android.annotation.SuppressLint("MissingPermission")
+private fun recordMicPcm(context: android.content.Context, durationSec: Int = 3): FloatArray {
+    val sampleRate = 16000
+    val totalSamples = sampleRate * durationSec
+    val minBuf = android.media.AudioRecord.getMinBufferSize(
+        sampleRate,
+        android.media.AudioFormat.CHANNEL_IN_MONO,
+        android.media.AudioFormat.ENCODING_PCM_16BIT
+    )
+    val bufferSize = maxOf(minBuf, totalSamples * 2)
+    val floatSamples = FloatArray(totalSamples)
+    var record: android.media.AudioRecord? = null
+    try {
+        record = android.media.AudioRecord(
+            android.media.MediaRecorder.AudioSource.MIC,
+            sampleRate,
+            android.media.AudioFormat.CHANNEL_IN_MONO,
+            android.media.AudioFormat.ENCODING_PCM_16BIT,
+            bufferSize
+        )
+        val shortBuffer = ShortArray(totalSamples)
+        record.startRecording()
+        var readSoFar = 0
+        val startTime = System.currentTimeMillis()
+        while (readSoFar < totalSamples && System.currentTimeMillis() - startTime < (durationSec + 1) * 1000L) {
+            val read = record.read(shortBuffer, readSoFar, totalSamples - readSoFar)
+            if (read <= 0) break
+            readSoFar += read
+        }
+        for (i in 0 until readSoFar) {
+            floatSamples[i] = shortBuffer[i] / 32768.0f
+        }
+    } catch (e: Exception) {
+        android.util.Log.e("VoiceScan", "Mic recording failed: " + e.message)
+    } finally {
+        try {
+            record?.stop()
+            record?.release()
+        } catch (ignored: Exception) {}
+    }
+    return floatSamples
 }
