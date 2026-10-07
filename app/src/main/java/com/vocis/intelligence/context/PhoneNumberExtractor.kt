@@ -1,0 +1,23 @@
+package com.vocis.intelligence.context
+
+object PhoneNumberExtractor {
+    fun extract(text: String): List<String> {
+        val candidates = mutableListOf<String>()
+        val regex = Regex("(?<!\\d)(?:\\+91|91)?[-.\\s]*[6-9](?:[-.\\s]*\\d){9}(?!\\d)")
+        val matches = regex.findAll(text)
+        
+        for (match in matches) {
+            val normalized = match.value.replace(Regex("[^0-9]"), "")
+            
+            val finalNumber = if (normalized.length == 10) {
+                "+91$normalized"
+            } else if (normalized.length == 12 && normalized.startsWith("91")) {
+                "+$normalized"
+            } else {
+                continue
+            }
+            candidates.add(finalNumber)
+        }
+        return candidates.distinct()
+    }
+}

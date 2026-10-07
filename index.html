@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VOCIS: Autonomous Voice Clone & Digital Arrest Defense Platform</title>
+  <meta name="description" content="Complete screen workflow, architecture, and interactive prototype for VOCIS - On-Device Biometric & Institutional Scam Interception.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Top Navigation Header ─────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="#" class="brand-logo">
+        <div class="logo-badge">
+          <!-- Official Geometric Diamond Emblem SVG -->
+          <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
+            <path d="M 50,12 L 88,50 L 50,88 L 12,50 Z" stroke="#3B6547" stroke-width="8" />
+            <path d="M 50,34 L 66,50 L 50,66 L 34,50 Z" fill="#3B6547" />
+          </svg>
+        </div>
+        <span class="brand-title">VOCIS</span>
+        <span class="badge-tag">v1.0 Zero-Trust</span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="#workflow" class="active">Screen Workflow</a>
+        <a href="#screens">Screen Architecture</a>
+        <a href="#architecture">Defense Pipeline</a>
+        <a href="#demo" class="btn-cta">Test Simulator</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Hero Section ─────────────────────────────────────────────────── -->
+  <section class="hero" id="overview">
+    <div class="hero-pill">
+      <span>🛡️</span> On-Device Zero-Trust Scam Interception Architecture
+    </div>
+    <h1>The Complete Screen Workflow & <br><span class="highlight">UI/UX Integration Blueprint</span></h1>
+    <p class="subtitle">
+      Comprehensive mapping of the entire user journey: from app initialization, permission onboarding, and live in-call overlay detection, to 10-phase digital arrest recovery and cryptographic SHA-256 evidence sealing.
+    </p>
+  </section>
+
+  <!-- ── Interactive Prototype & Workflow Explorer ──────────────────────── -->
+  <section class="workflow-explorer" id="workflow">
+    <div class="explorer-grid">
+
+      <!-- Left Column: Sequential Screen Workflow Chain -->
+      <div class="workflow-steps-panel">
+        <div class="section-label">Sequential Flow</div>
+        <h2>Step-by-Step Screen Navigator</h2>
+        <p style="color: var(--vocis-grey); font-size: 0.95rem;">
+          Click any step below to see its live representation and role in the user lifecycle.
+        </p>
+
+        <div class="workflow-chain">
+          <!-- Step 1 -->
+          <div class="step-card" data-screen="splash">
+            <div class="step-number">1</div>
+            <div class="step-info">
+              <h3>Screen 01: Brand Splash Screen</h3>
+              <p>Onyx dark theme with pulsing diamond emblem aura & cold-boot telemetry check.</p>
+            </div>
+            <div class="step-badge">Figma Frame 1</div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-card" data-screen="onboarding">
+            <div class="step-number">2</div>
+            <div class="step-info">
+              <h3>Screen 02: Onboarding Welcome</h3>
+              <p>"Your Voice, Your Shield" hero card with official green diamond emblem.</p>
+            </div>
+            <div class="step-badge">Figma Frame 2</div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-card" data-screen="permissions">
+            <div class="step-number">3</div>
+            <div class="step-info">
+              <h3>Screen 03: Permissions Setup</h3>
+              <p>Call Screening role, audio recording, system overlays & SMS telemetry toggles.</p>
+            </div>
+            <div class="step-badge">Figma Frame 3</div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="step-card active" data-screen="dashboard">
+            <div class="step-number">4</div>
+            <div class="step-info">
+              <h3>Screen 04: Shield Dashboard (Home Page)</h3>
+              <p>Forest green "Protection Active" hero, quick stats, active extortion alert & interaction feed.</p>
+            </div>
+            <div class="step-badge">Figma Frame 4</div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="step-card" data-screen="calls">
+            <div class="step-number">5</div>
+            <div class="step-info">
+              <h3>Screen 05: Call Screening History</h3>
+              <p>All / Safe / Flagged / Blocked filter chips, risk pills, caller reputation tags.</p>
+            </div>
+            <div class="step-badge">Figma Frame 5</div>
+          </div>
+
+          <!-- Step 6 -->
+          <div class="step-card" data-screen="voices">
+            <div class="step-number">6</div>
+            <div class="step-info">
+              <h3>Screen 06: Voice Biometric Profiles</h3>
+              <p>AASIST model status, trusted family voiceprints & AES-256 vault status.</p>
+            </div>
+            <div class="step-badge">Figma Frame 6</div>
+          </div>
+
+          <!-- Step 7 -->
+          <div class="step-card" data-screen="enrollment">
+            <div class="step-number">7</div>
+            <div class="step-info">
+              <h3>Screens 08 & 09: Voice Enrollment Modal</h3>
+              <p>10-second speech recording with pulsing waveform & cryptographic embedding seal.</p>
+            </div>
+            <div class="step-badge">Frames 8 & 9</div>
+          </div>
+
+          <!-- Step 8 -->
+          <div class="step-card" data-screen="tools">
+            <div class="step-number">8</div>
+            <div class="step-info">
+              <h3>Screens 07 & 13: Safety Tools Console</h3>
+              <p>Digital Arrest Launcher, Evidence Vault, SMS NLP Scanner & Voice Clone Scanner.</p>
+            </div>
+            <div class="step-badge">Frames 7 & 13</div>
+          </div>
+
+          <!-- Step 9 -->
+          <div class="step-card" data-screen="digitalArrest">
+            <div class="step-number">9</div>
+            <div class="step-info">
+              <h3>Screen 11: 10-Phase Digital Arrest Defense</h3>
+              <p>Interactive legal education wizard, institutional claims breakdown & court dossier trigger.</p>
+            </div>
+            <div class="step-badge">Figma Frame 11</div>
+          </div>
+
+          <!-- Step 10 -->
+          <div class="step-card" data-screen="evidenceVault">
+            <div class="step-number">10</div>
+            <div class="step-info">
+              <h3>Screen 12: Forensic Evidence Vault</h3>
+              <p>Cryptographic SHA-256 sealed PDF dossiers & one-tap Cyber Crime 1930 dialing.</p>
+            </div>
+            <div class="step-badge">Figma Frame 12</div>
+          </div>
+
+          <!-- Step 11 -->
+          <div class="step-card" data-screen="emergency">
+            <div class="step-number">11</div>
+            <div class="step-info">
+              <h3>Screen 10: Emergency SOS Screen</h3>
+              <p>85% acoustic siren override, keyguard bypass & cloud TextBee family dispatch.</p>
+            </div>
+            <div class="step-badge">Figma Frame 10</div>
+          </div>
+
+          <!-- Step 12 -->
+          <div class="step-card" data-screen="settings">
+            <div class="step-number">12</div>
+            <div class="step-info">
+              <h3>Settings Screen: Protection Modes</h3>
+              <p>Balanced, Strict High-Security, Monitor Only & emergency keyword customization.</p>
+            </div>
+            <div class="step-badge">Settings</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Phone Simulator -->
+      <div class="device-simulator-container" id="demo">
+        <div style="margin-bottom: 12px; display: flex; gap: 10px;">
+          <button class="btn-cta" id="sim-toggle-overlay" style="padding: 6px 14px; font-size: 0.8rem; background: var(--vocis-green);">
+            Toggle Floating System Window
+          </button>
+        </div>
+
+        <div class="phone-bezel">
+          <div class="phone-notch"></div>
+          
+          <div class="phone-screen">
+            <div class="simulator-status-bar">
+              <span>9:41</span>
+              <span>📶 5G  🔋 100%</span>
+            </div>
+
+            <!-- Floating In-Call System Overlay Pill (Phase 19 Simulator) -->
+            <div id="sim-floating-pill" style="display: none; position: absolute; top: 50px; left: 18px; z-index: 90; background: #1C1C1E; color: white; padding: 8px 16px; border-radius: 9999px; border: 2px solid #D32F2F; box-shadow: 0 10px 25px rgba(0,0,0,0.4); display: none; align-items: center; gap: 10px; font-size: 0.75rem; font-weight: 700;">
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: #D32F2F; display: inline-block;"></span>
+              <span>VOCIS: Threat 88% (Arrest Scam)</span>
+            </div>
+
+            <div class="screen-viewport">
+
+              <!-- VIEW 1: Splash Screen -->
+              <div class="screen-view" id="view-splash" style="background: #1C1C1E; color: white; height: 100%; justify-content: center; align-items: center; border-radius: 20px; text-align: center; padding: 20px;">
+                <div style="width: 80px; height: 80px; background: #27382B; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                  <svg width="48" height="48" viewBox="0 0 100 100" fill="none">
+                    <path d="M 50,12 L 88,50 L 50,88 L 12,50 Z" stroke="#7CB88B" stroke-width="8" />
+                    <path d="M 50,34 L 66,50 L 50,66 L 34,50 Z" fill="#7CB88B" />
+                  </svg>
+                </div>
+                <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: 3px;">VOCIS</h2>
+                <p style="font-size: 0.7rem; color: #8E8E93; letter-spacing: 1.5px; margin-top: 6px;">ZERO-TRUST BIOMETRIC & SCAM DEFENSE</p>
+                <div style="margin-top: 40px; font-size: 0.75rem; color: #7CB88B; font-weight: 600;">Tap anywhere or choose a step</div>
+              </div>
+
+              <!-- VIEW 2: Onboarding Welcome Screen -->
+              <div class="screen-view" id="view-onboarding">
+                <div style="background: #E8F5E9; border-radius: 20px; padding: 30px 20px; text-align: center; border: 1px solid var(--vocis-border);">
+                  <div style="width: 72px; height: 72px; background: white; border-radius: 20px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
+                    <svg width="42" height="42" viewBox="0 0 100 100" fill="none">
+                      <path d="M 50,12 L 88,50 L 50,88 L 12,50 Z" stroke="#3B6547" stroke-width="8" />
+                      <path d="M 50,34 L 66,50 L 50,66 L 34,50 Z" fill="#3B6547" />
+                    </svg>
+                  </div>
+                  <span style="font-size: 0.75rem; font-weight: 800; color: var(--vocis-green); letter-spacing: 1.5px;">VOCIS SHIELD</span>
+                </div>
+                <h2 style="font-size: 1.5rem; font-weight: 800;">Your Voice,<br>Your Shield</h2>
+                <p style="font-size: 0.85rem; color: var(--vocis-grey);">
+                  Advanced on-device protection intercepting AI voice clones and digital arrest extortion.
+                </p>
+                <button class="btn-cta" id="sim-btn-get-started" style="margin-top: 20px; width: 100%;">
+                  Get Started →
+                </button>
+              </div>
+
+              <!-- VIEW 3: Onboarding Permissions Screen -->
+              <div class="screen-view" id="view-permissions">
+                <h2 style="font-size: 1.3rem; font-weight: 800;">Permissions Setup</h2>
+                <p style="font-size: 0.8rem; color: var(--vocis-grey);">Grant necessary security permissions to enable real-time screening.</p>
+                
+                <div style="background: white; border: 1px solid var(--vocis-border); border-radius: 14px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.85rem;">Call Screening Role</div>
+                    <div style="font-size: 0.75rem; color: var(--vocis-grey);">Blocks incoming scam numbers</div>
+                  </div>
+                  <input type="checkbox" checked style="accent-color: var(--vocis-green); width: 20px; height: 20px;">
+                </div>
+
+                <div style="background: white; border: 1px solid var(--vocis-border); border-radius: 14px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.85rem;">Microphone Sensor</div>
+                    <div style="font-size: 0.75rem; color: var(--vocis-grey);">Detects synthetic AI voice clones</div>
+                  </div>
+                  <input type="checkbox" checked style="accent-color: var(--vocis-green); width: 20px; height: 20px;">
+                </div>
+
+                <div style="background: white; border: 1px solid var(--vocis-border); border-radius: 14px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.85rem;">System Overlays</div>
+                    <div style="font-size: 0.75rem; color: var(--vocis-grey);">Displays floating threat HUD</div>
+                  </div>
+                  <input type="checkbox" checked style="accent-color: var(--vocis-green); width: 20px; height: 20px;">
+                </div>
+
+                <button class="btn-cta" id="sim-btn-enable-protection" style="margin-top: 10px; width: 100%; background: var(--vocis-green);">
+                  Enable Full Protection ✓
+                </button>
+              </div>
+
+              <!-- VIEW 4: Dashboard Screen (Home) -->
+              <div class="screen-view active" id="view-dashboard">
+                <div class="phone-hero-card">
+                  <div class="phone-hero-header">
+                    <div>
+                      <div class="phone-hero-title">VOCIS SHIELD</div>
+                      <div class="phone-hero-status">Protection Active</div>
+                    </div>
+                    <div style="width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                      <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+                        <path d="M 50,12 L 88,50 L 50,88 L 12,50 Z" stroke="#ffffff" stroke-width="8" />
+                        <path d="M 50,34 L 66,50 L 50,66 L 34,50 Z" fill="#ffffff" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div style="font-size: 0.8rem; opacity: 0.9;">
+                    Zero-trust neural models and call screening operating locally.
+                  </div>
+                </div>
+
+                <div class="phone-stats-row">
+                  <div class="phone-stat-card">
+                    <div class="stat-num">18</div>
+                    <div class="stat-label">Calls Screened</div>
+                  </div>
+                  <div class="phone-stat-card">
+                    <div class="stat-num" style="color: var(--vocis-green);">100%</div>
+                    <div class="stat-label">Model Health</div>
+                  </div>
+                </div>
+
+                <!-- Active Incident Card -->
+                <div class="phone-incident-card" style="cursor: pointer;" id="sim-btn-open-arrest">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 0.75rem; font-weight: 800; color: var(--vocis-red);">⚠️ ACTIVE THREAT INTERCEPTED</span>
+                    <span style="font-size: 0.7rem; background: var(--vocis-red-light); color: var(--vocis-red); padding: 2px 6px; border-radius: 4px; font-weight: 700;">Score 94%</span>
+                  </div>
+                  <div style="font-size: 0.85rem; font-weight: 800; color: var(--vocis-dark);">Digital Arrest Extortion Scheme</div>
+                  <div style="font-size: 0.75rem; color: var(--vocis-grey); margin-top: 2px;">Claimed DCP Mumbai Police demanding video confinement.</div>
+                  <div style="font-size: 0.75rem; color: var(--vocis-green); font-weight: 700; margin-top: 8px;">Tap to Open Guided Recovery →</div>
+                </div>
+
+                <div style="font-size: 0.85rem; font-weight: 800; color: var(--vocis-dark); margin-top: 4px;">Recent Telemetry</div>
+                <div class="phone-feed-item">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.8rem;">+91 98888 77771 (Mom)</div>
+                    <div style="font-size: 0.7rem; color: var(--vocis-grey);">Inbound Call • Voiceprint Verified</div>
+                  </div>
+                  <span style="color: var(--vocis-green); font-weight: 700; font-size: 0.75rem;">SAFE</span>
+                </div>
+              </div>
+
+              <!-- VIEW 5: Calls Screen -->
+              <div class="screen-view" id="view-calls">
+                <h2 style="font-size: 1.3rem; font-weight: 800;">Calls Screened</h2>
+                <div style="display: flex; gap: 8px; margin-bottom: 4px;">
+                  <span style="background: var(--vocis-dark); color: white; font-size: 0.7rem; padding: 4px 10px; border-radius: 9999px; font-weight: 700;">All (18)</span>
+                  <span style="background: white; border: 1px solid var(--vocis-border); font-size: 0.7rem; padding: 4px 10px; border-radius: 9999px;">Safe (16)</span>
+                  <span style="background: white; border: 1px solid var(--vocis-border); font-size: 0.7rem; padding: 4px 10px; border-radius: 9999px;">Flagged (2)</span>
+                </div>
+
+                <div class="phone-feed-item">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.85rem;">+91 98765 43210</div>
+                    <div style="font-size: 0.7rem; color: var(--vocis-red); font-weight: 600;">CBI Impersonation • 94% Risk</div>
+                  </div>
+                  <span style="background: var(--vocis-red-light); color: var(--vocis-red); font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 6px;">BLOCKED</span>
+                </div>
+
+                <div class="phone-feed-item">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.85rem;">+91 98888 77771</div>
+                    <div style="font-size: 0.7rem; color: var(--vocis-grey);">Mom • Verified Biometrics</div>
+                  </div>
+                  <span style="background: var(--vocis-green-light); color: var(--vocis-green); font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 6px;">SAFE</span>
+                </div>
+
+                <div class="phone-feed-item">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.85rem;">+91 80012 34567</div>
+                    <div style="font-size: 0.7rem; color: var(--vocis-grey);">HDFC Bank (Caller ID Verified)</div>
+                  </div>
+                  <span style="background: var(--vocis-green-light); color: var(--vocis-green); font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 6px;">SAFE</span>
+                </div>
+              </div>
+
+              <!-- VIEW 6: Voices Screen -->
+              <div class="screen-view" id="view-voices">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <h2 style="font-size: 1.3rem; font-weight: 800;">Voice Defense</h2>
+                  <span style="background: var(--vocis-green-light); color: var(--vocis-green); font-size: 0.7rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">AASIST Active</span>
+                </div>
+
+                <div class="phone-feed-item">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--vocis-green-light); display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--vocis-green);">M</div>
+                    <div>
+                      <div style="font-weight: 700; font-size: 0.85rem;">Mom</div>
+                      <div style="font-size: 0.7rem; color: var(--vocis-grey);">+91 98888 77771 • 3 Utterances</div>
+                    </div>
+                  </div>
+                  <span style="color: var(--vocis-green); font-weight: 700; font-size: 0.75rem;">Verified ✓</span>
+                </div>
+
+                <div class="phone-feed-item">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--vocis-green-light); display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--vocis-green);">B</div>
+                    <div>
+                      <div style="font-weight: 700; font-size: 0.85rem;">Brother</div>
+                      <div style="font-size: 0.7rem; color: var(--vocis-grey);">+91 98888 77772 • Enrolled</div>
+                    </div>
+                  </div>
+                  <span style="color: var(--vocis-green); font-weight: 700; font-size: 0.75rem;">Verified ✓</span>
+                </div>
+
+                <button class="btn-cta" id="sim-btn-enroll-voice" style="width: 100%; margin-top: 10px;">
+                  + Enroll New Voice Profile
+                </button>
+              </div>
+
+              <!-- VIEW 7: Voice Enrollment Simulator -->
+              <div class="screen-view" id="view-enrollment" style="text-align: center;">
+                <h2 style="font-size: 1.3rem; font-weight: 800;">Enroll Voice Profile</h2>
+                <p style="font-size: 0.8rem; color: var(--vocis-grey);">Speak naturally for 10 seconds to generate a neural embedding.</p>
+
+                <div style="width: 100px; height: 100px; border-radius: 50%; background: var(--vocis-green-light); margin: 24px auto; display: flex; align-items: center; justify-content: center;">
+                  <div style="width: 66px; height: 66px; border-radius: 50%; background: var(--vocis-green); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.8rem;">
+                    🎙️
+                  </div>
+                </div>
+
+                <div style="font-size: 0.85rem; font-weight: 700; color: var(--vocis-green);">Recording Audio Stream (16kHz)...</div>
+                <div style="height: 6px; width: 70%; background: var(--vocis-border); border-radius: 9999px; margin: 12px auto; overflow: hidden;">
+                  <div style="width: 75%; height: 100%; background: var(--vocis-green);"></div>
+                </div>
+
+                <button class="btn-cta" id="sim-btn-finish-enroll" style="margin-top: 20px; width: 100%; background: var(--vocis-green);">
+                  Complete & Seal Profile ✓
+                </button>
+              </div>
+
+              <!-- VIEW 8: Safety Tools Screen -->
+              <div class="screen-view" id="view-tools">
+                <h2 style="font-size: 1.3rem; font-weight: 800;">Safety Tools</h2>
+                
+                <div class="phone-feed-item" style="cursor: pointer;" id="sim-btn-open-evidence">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.85rem;">📁 Forensic Evidence Vault</div>
+                    <div style="font-size: 0.7rem; color: var(--vocis-grey);">Cryptographic SHA-256 PDF dossiers</div>
+                  </div>
+                  <span style="color: var(--vocis-green); font-size: 0.8rem; font-weight: 800;">Open →</span>
+                </div>
+
+                <div class="phone-feed-item" style="cursor: pointer;" id="sim-btn-open-sos">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.85rem;">🚨 Emergency Family SOS</div>
+                    <div style="font-size: 0.7rem; color: var(--vocis-grey);">85% alarm siren override & TextBee SMS</div>
+                  </div>
+                  <span style="color: var(--vocis-red); font-size: 0.8rem; font-weight: 800;">SOS →</span>
+                </div>
+
+                <div class="phone-feed-item">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.85rem;">💬 SMS Threat Scanner</div>
+                    <div style="font-size: 0.7rem; color: var(--vocis-grey);">NLP heuristics for fake utility bills & OTP</div>
+                  </div>
+                  <span style="color: var(--vocis-green); font-size: 0.8rem; font-weight: 800;">Active</span>
+                </div>
+              </div>
+
+              <!-- VIEW 9: Digital Arrest Guided Recovery Wizard -->
+              <div class="screen-view" id="view-digital-arrest">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; font-weight: 800; color: var(--vocis-red);">LEGAL COUNTER-EXTORTION</span>
+                  <span style="font-size: 0.7rem; background: var(--vocis-red-light); color: var(--vocis-red); padding: 2px 6px; border-radius: 4px; font-weight: 800;">VIOLATIONS: 5/5</span>
+                </div>
+
+                <div id="sim-arrest-phase-title" style="font-size: 1rem; font-weight: 800; color: var(--vocis-dark); margin-top: 6px;">
+                  Phase 1: Alert Detected (Extortion Coercion Identified)
+                </div>
+
+                <div style="height: 6px; width: 100%; background: var(--vocis-border); border-radius: 9999px; overflow: hidden; margin: 4px 0 8px;">
+                  <div id="sim-arrest-progress" style="width: 10%; height: 100%; background: var(--vocis-red); transition: width 0.3s ease;"></div>
+                </div>
+
+                <div style="background: #FFF3E0; border: 1px solid #FFE0B2; border-radius: 12px; padding: 10px; font-size: 0.75rem; color: #E65100;">
+                  ⚠️ <b>LEGAL FACT:</b> Indian Police and Courts NEVER arrest individuals over WhatsApp/Skype video calls or ask for funds transfers.
+                </div>
+
+                <div style="background: white; border: 1px solid var(--vocis-border); border-radius: 12px; padding: 10px; font-size: 0.75rem;">
+                  <div style="font-weight: 700; color: var(--vocis-dark);">RULE_01: Law Enforcement Impersonation</div>
+                  <div style="color: var(--vocis-grey); margin-top: 2px;">Claimed "DCP Cyber Crime Mumbai" without valid warrant.</div>
+                </div>
+
+                <button class="btn-cta" id="sim-btn-next-phase" style="width: 100%; margin-top: 8px; background: var(--vocis-dark);">
+                  Next Recovery Step →
+                </button>
+              </div>
+
+              <!-- VIEW 10: Forensic Evidence Vault -->
+              <div class="screen-view" id="view-evidence">
+                <h2 style="font-size: 1.25rem; font-weight: 800;">Evidence Vault</h2>
+                <p style="font-size: 0.75rem; color: var(--vocis-grey);">SHA-256 signed tamper-proof court dossiers.</p>
+
+                <div style="background: white; border: 1px solid var(--vocis-border); border-radius: 14px; padding: 12px;">
+                  <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.8rem;">
+                    <span style="color: var(--vocis-green);">VCS-2026-8821A</span>
+                    <span style="background: var(--vocis-green-light); color: var(--vocis-green); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem;">SEALED ✓</span>
+                  </div>
+                  <div style="font-weight: 800; font-size: 0.85rem; margin-top: 4px;">Digital Arrest Extortion</div>
+                  <div style="font-size: 0.7rem; color: var(--vocis-grey);">Caller: +91 98765 43210</div>
+                  <div style="background: var(--vocis-cream); padding: 6px; border-radius: 6px; font-family: monospace; font-size: 0.6rem; margin-top: 6px; word-break: break-all;">
+                    SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                  </div>
+                  <button class="btn-cta" style="margin-top: 8px; width: 100%; font-size: 0.75rem; padding: 6px;" onclick="alert('Forensic PDF exported to Downloads folder with SHA-256 cryptographic signature.')">
+                    Export Court-Ready PDF 📄
+                  </button>
+                </div>
+
+                <div style="background: var(--vocis-red-light); border: 1px solid #FFCDD2; border-radius: 12px; padding: 10px; text-align: center;">
+                  <div style="font-size: 0.8rem; font-weight: 800; color: var(--vocis-red);">National Cyber Crime Reporting</div>
+                  <div style="font-size: 0.7rem; color: var(--vocis-dark); margin-top: 2px;">One-tap file report on cybercrime.gov.in</div>
+                  <button class="btn-cta" style="margin-top: 6px; background: var(--vocis-red); font-size: 0.75rem; padding: 6px 12px;" onclick="alert('Dialing National Cyber Crime Helpline: 1930')">
+                    Dial 1930 Helpline 📞
+                  </button>
+                </div>
+              </div>
+
+              <!-- VIEW 11: Emergency SOS Screen -->
+              <div class="screen-view" id="view-emergency">
+                <div style="background: #1A0000; border: 2px solid var(--vocis-red); border-radius: 16px; padding: 16px; text-align: center; color: white;">
+                  <div style="font-size: 1.8rem;">🚨</div>
+                  <div style="font-size: 1.1rem; font-weight: 800; color: #FF5252;">EMERGENCY SOS ACTIVE</div>
+                  <div style="font-size: 0.75rem; color: #ccc; margin-top: 4px;">Alarm stream locked at 85% volume</div>
+                </div>
+
+                <div class="phone-feed-item">
+                  <div>
+                    <div style="font-weight: 700; font-size: 0.8rem;">TextBee Cloud SMS Gateway</div>
+                    <div style="font-size: 0.7rem; color: var(--vocis-green);">Dispatched to Mom (+91 98888 77771)</div>
+                  </div>
+                  <span style="color: var(--vocis-green); font-weight: 800; font-size: 0.75rem;">SENT ✓</span>
+                </div>
+
+                <button class="btn-cta" style="background: var(--vocis-red); width: 100%; padding: 12px; margin-top: 10px;" onclick="alert('Emergency Alarm Silenced.')">
+                  Silence & Dismiss Alarm
+                </button>
+              </div>
+
+              <!-- VIEW 12: Settings Screen -->
+              <div class="screen-view" id="view-settings">
+                <h2 style="font-size: 1.3rem; font-weight: 800;">Settings</h2>
+
+                <div style="background: white; border: 1.5px solid var(--vocis-green); border-radius: 14px; padding: 12px;">
+                  <div style="font-weight: 800; font-size: 0.85rem; color: var(--vocis-green);">Balanced Protection (Recommended)</div>
+                  <div style="font-size: 0.75rem; color: var(--vocis-grey); margin-top: 2px;">Standard call screening & local neural checks.</div>
+                </div>
+
+                <div style="background: white; border: 1px solid var(--vocis-border); border-radius: 14px; padding: 12px;">
+                  <div style="font-weight: 800; font-size: 0.85rem; color: var(--vocis-dark);">Strict High-Security Mode</div>
+                  <div style="font-size: 0.75rem; color: var(--vocis-grey); margin-top: 2px;">Immediately rejects all unverified numbers >50 score.</div>
+                </div>
+
+                <div style="background: white; border: 1px solid var(--vocis-border); border-radius: 14px; padding: 12px;">
+                  <div style="font-weight: 800; font-size: 0.85rem; color: var(--vocis-dark);">Emergency Trigger Keyword</div>
+                  <div style="font-size: 0.75rem; color: var(--vocis-grey); margin-top: 2px;">Configured word: <b>"VOCIS"</b></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Bottom Navigation Tabs inside Phone -->
+            <div class="phone-bottom-nav">
+              <div class="nav-tab-item active" data-tab="dashboard">
+                <span class="icon">🛡️</span>
+                <span>Shield</span>
+              </div>
+              <div class="nav-tab-item" data-tab="calls">
+                <span class="icon">📞</span>
+                <span>Calls</span>
+              </div>
+              <div class="nav-tab-item" data-tab="voices">
+                <span class="icon">🎙️</span>
+                <span>Voices</span>
+              </div>
+              <div class="nav-tab-item" data-tab="tools">
+                <span class="icon">🔧</span>
+                <span>Tools</span>
+              </div>
+              <div class="nav-tab-item" data-tab="settings">
+                <span class="icon">⚙️</span>
+                <span>Settings</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Detailed Screen Architecture Breakdown ──────────────────────────── -->
+  <section class="workflow-breakdown" id="screens">
+    <div class="section-header">
+      <div class="section-label">Figma Screen Architecture</div>
+      <h2>Mapped Screen Specifications</h2>
+      <p style="color: var(--vocis-grey); max-width: 600px; margin: 0 auto;">
+        Every screen designed in the Figma prototype maps directly to Jetpack Compose components and backend state engines.
+      </p>
+    </div>
+
+    <div class="flow-cards-grid">
+      <!-- Card 1 -->
+      <div class="flow-detail-card">
+        <span class="flow-badge">ENTRY POINT • FRAME 1</span>
+        <h3>Splash Screen</h3>
+        <p>Minimalist dark onyx theme displaying the central green diamond emblem with pulsing status aura.</p>
+        <ul class="step-checklist">
+          <li>Runs cold-boot local database initialization</li>
+          <li>Checks AES-256 AndroidKeyStore hardware vault</li>
+          <li>1.6s smooth alpha/scale transition to onboarding or home</li>
+        </ul>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="flow-detail-card">
+        <span class="flow-badge">ONBOARDING • FRAMES 2 & 3</span>
+        <h3>Welcome & Permissions</h3>
+        <p>Walks the user through zero-trust privacy guarantees and enables the 4 core telephony sensors.</p>
+        <ul class="step-checklist">
+          <li>Call Screening Role (Android 10+ <code>RoleManager</code>)</li>
+          <li>System Alert Window for in-call floating HUD</li>
+          <li>Microphone sensor for real-time 16kHz speech analysis</li>
+          <li>SMS Telemetry receiver with priority 999</li>
+        </ul>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="flow-detail-card">
+        <span class="flow-badge">CORE HUD • FRAME 4</span>
+        <h3>Shield Dashboard (Home)</h3>
+        <p>The primary control station presenting real-time protection health and active threats.</p>
+        <ul class="step-checklist">
+          <li>Forest Green "Protection Active" status card</li>
+          <li>Quick telemetry counts (Safe / Flagged / Blocked)</li>
+          <li>Urgent Extortion alert card with one-tap action</li>
+          <li>Live interaction activity feed</li>
+        </ul>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="flow-detail-card">
+        <span class="flow-badge">BIOMETRICS • FRAMES 6, 8, 9</span>
+        <h3>Voice Biometric Vault</h3>
+        <p>Enrolls trusted contacts and executes on-device anti-spoofing via AASIST neural model.</p>
+        <ul class="step-checklist">
+          <li>AASIST neural model operating at 16kHz with 200ms latency</li>
+          <li>10-second interactive voice recording dialog</li>
+          <li>Resemblyzer 256-dimensional biometric embedding generation</li>
+          <li>Hardware vault storage with AES-256-GCM encryption</li>
+        </ul>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="flow-detail-card">
+        <span class="flow-badge">EXTORTION DEFENSE • FRAME 11</span>
+        <h3>Digital Arrest Counter</h3>
+        <p>10-phase guided recovery engine stopping institutional coercion, Skype trials, and escrow demands.</p>
+        <ul class="step-checklist">
+          <li>Evaluates 5 deterministic institutional scam rules</li>
+          <li>Educates victim on official legal procedures</li>
+          <li>Freezes financial actions and disables video isolation</li>
+          <li>Generates court-ready SHA-256 sealed PDF report</li>
+        </ul>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="flow-detail-card">
+        <span class="flow-badge">LEGAL EVIDENCE • FRAME 12</span>
+        <h3>Forensic Evidence Vault</h3>
+        <p>Cryptographic dossiers providing tamper-proof legal evidence for police & cybercrime reporting.</p>
+        <ul class="step-checklist">
+          <li>64-character SHA-256 digital signature seal</li>
+          <li>Device hardware fingerprinting (Manufacturer & Build)</li>
+          <li>One-tap dialing to National Cyber Crime Helpline (1930)</li>
+          <li>Direct integration with cybercrime.gov.in portal</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Defense Pipeline Architecture ───────────────────────────────────── -->
+  <section class="workflow-breakdown" id="architecture" style="background: var(--vocis-cream-darker); padding: 5rem 2rem; margin: 0; max-width: 100%;">
+    <div style="max-width: 1280px; margin: 0 auto;">
+      <div class="section-header">
+        <div class="section-label">End-to-End System Architecture</div>
+        <h2>4-Tier Zero-Trust Pipeline</h2>
+        <p style="color: var(--vocis-grey); max-width: 600px; margin: 0 auto;">
+          How raw telephony events pass through on-device models to prevent scams before damage occurs.
+        </p>
+      </div>
+
+      <div class="flow-cards-grid">
+        <div class="flow-detail-card">
+          <span class="flow-badge">TIER 1 • SENSORS</span>
+          <h3>Ingestion Layer</h3>
+          <p>Real-time low-latency hardware and platform sensors intercepting communications on device.</p>
+          <ul class="step-checklist">
+            <li><code>CallScreeningSensor</code>: pre-ring interception</li>
+            <li><code>SmsSensor</code>: 60+ regex heuristic filter</li>
+            <li><code>LiveVerificationService</code>: mic audio stream</li>
+          </ul>
+        </div>
+
+        <div class="flow-detail-card">
+          <span class="flow-badge">TIER 2 • LOCAL INFERENCE</span>
+          <h3>Intelligence Engine</h3>
+          <p>Multi-modal evidence fusion engine executing on-device neural and linguistic classification.</p>
+          <ul class="step-checklist">
+            <li><code>AASIST</code>: synthetic voice clone detection</li>
+            <li><code>LinguisticScamAnalyzer</code>: extortion keywords</li>
+            <li><code>CallerIdentityResolver</code>: E.164 reputation</li>
+          </ul>
+        </div>
+
+        <div class="flow-detail-card">
+          <span class="flow-badge">TIER 3 • RECOVERY</span>
+          <h3>State Machine</h3>
+          <p>Deterministic state machines and automated emergency loops taking immediate action.</p>
+          <ul class="step-checklist">
+            <li><code>DigitalArrestController</code>: 10 recovery phases</li>
+            <li><code>EmergencyAlarmSystem</code>: 85% volume siren</li>
+            <li><code>FamilyAlertDispatcher</code>: TextBee SMS alert</li>
+          </ul>
+        </div>
+
+        <div class="flow-detail-card">
+          <span class="flow-badge">TIER 4 • LEGAL INTEGRITY</span>
+          <h3>Cryptographic Vault</h3>
+          <p>Zero-trust security layer ensuring chain-of-custody for legal prosecution.</p>
+          <ul class="step-checklist">
+            <li><code>DigitalArrestPdfGenerator</code>: PDF dossier</li>
+            <li><code>computeEvidenceSeal</code>: SHA-256 signature</li>
+            <li><code>BiometricCryptoVault</code>: AES-256 keyguard</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div>
+        <div style="font-size: 1.5rem; font-weight: 800; letter-spacing: 2px;">VOCIS</div>
+        <p style="color: var(--vocis-grey); font-size: 0.85rem; margin-top: 4px;">
+          Autonomous On-Device Voice Clone & Digital Arrest Defense Platform
+        </p>
+      </div>
+
+      <div>
+        <span style="font-size: 0.85rem; color: #A5D6A7; font-weight: 700;">100% On-Device • Zero Cloud Audio Transmission</span>
+      </div>
+    </div>
+
+    <div class="footer-sub">
+      Built clean-room in compliance with VOCIS Master Technical Specification & Figma Design Guidelines.
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

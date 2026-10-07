@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer Diamond Border centered in 108x108 adaptive canvas -->
+    <path
+        android:pathData="M 54,26 L 82,54 L 54,82 L 26,54 Z"
+        android:strokeColor="#3B6547"
+        android:strokeWidth="5.5"
+        android:strokeLineJoin="miter"
+        android:fillColor="#00000000" />
+
+    <!-- Inner Solid Diamond Core -->
+    <path
+        android:pathData="M 54,42 L 66,54 L 54,66 L 42,54 Z"
+        android:fillColor="#3B6547" />
+
+</vector>
